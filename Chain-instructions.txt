@@ -1,0 +1,99 @@
+Versions of ChaiN are currently in wolf4192/Chain/
+
+Test dataset:
+~/Chain-backup/test2125/data/C127/G1/CTCF
+or
+~/sandbox/C127
+
+Test output
+~/Chain-backup/results ...
+
+Can't use sshfs because 2125 does not have it installed
+Can't used mount (below) because I need to be root.
+Currently just have to copy the date into the actual chain data folder
+
+(this mounting does not currently work:
+Mount data as read-only from micron 5 to bioch7134
+mount -Br ~/Chain-backup/test2125/data ~/Chain/eze/Documents/papers/chrom_marks/data
+
+Mount results
+mount -B ~/Chain-backup/test2125/results ~/Chain/eze/Documents/papers/chrom_marks/results/
+)
+
+Currently need to copy all of G1 data from all the trip directories in bioc1090/data which also end in the "*SIR_THR_ALN.tif" and "*MCNR-mask.tif":
+
+find LS2018-07-03_1_C127_Trip/ -type f \( -name "*G1*" -and \( -name "*SIR_THR_ALN.tif" -or -name "*MCNR-mask.tif" \) \) -exec cp {} ~/papers/data/C127/Trip \;
+
+Then need to scp to my own machine to open all and save them as tifs again in imageJ with a OS.ijm macro.
+
+Then scp to copy them back to data in chain.
+
+
+Do make distribution (make -j8 distribution)
+make d2b
+make d2bfit
+make d2bnorm
+
+Then to aggregate the distribution and network data:
+Summary.R
+	spot-class-count.R
+		dist_compile.R
+		SA2vol.R
+
+To aggregate d2b data:
+summaryd2b.R
+	d2b_compile.R
+
+
+Requirements:
+
+R:  	R 3.3
+	bioimagetools: (source code: https://r-forge.r-project.org/R/?group_id=1143 )
+ 
+ $ R
+    R version 3.3.3 (2017-03-06) -- "Another Canoe"
+    Copyright (C) 2017 The R Foundation for Statistical Computing
+    Platform: x86_64-pc-linux-gnu (64-bit)
+    [...]
+    > setRepositories(ind=c(1,2))
+    > install.packages("bioimagetools")
+    Installing package into ‘/usr/local/lib/R/site-library’
+    (as ‘lib’ is unspecified)
+    Warning in install.packages("bioimagetools") :
+      'lib = "/usr/local/lib/R/site-library"' is not writable
+    Would you like to use a personal library instead?  (y/n) y
+    Would you like to create a personal library
+    ~/R/x86_64-pc-linux-gnu-library/3.3
+    to install packages into?  (y/n) y
+    --- Please select a CRAN mirror for use in this session ---
+    [...]
+    Selection: 67
+    also installing the dependencies ‘jpeg’, ‘locfit’, ‘fftwtools’, ‘tiff’, ‘EBImage’
+    [...]
+    * DONE (bioimagetools)
+    [...]
+    > library('bioimagetools')
+    Bioimagetools 1.1.3
+
+
+
+###########
+
+
+Octave:	Octave 4.0.3
+    	Octave-image 2.6.1
+    	Octave-statistics 1.3.0
+
+
+	bioformats:
+(in a terminal)
+	wget https://downloads.openmicroscopy.org/bio-formats/5.9.2/artifacts/bioformats-octave-5.9.2.tar.gz
+    	octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
+
+Need to also make a text file in your home: ~/javaclasspath.txt
+with this inside: /usr/local/share/java/bioformats_package.jar
+to guide bioformats to the location of the bioformats_package.jar located on the machine.
+
+
+GraphicsMagick-1.3.23
+

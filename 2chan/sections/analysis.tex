@@ -1,0 +1,112 @@
+\section{Analysis of SIM data}
+
+  Methods for analysis of SIM data are not deeply different from the
+  methods used to to analyse data from typical widefield microscopy. The
+  mathematical principles remain unchanged, only the pixel size has been
+  reduced which may require a more careful thought.  The main issues with
+  analysis of SIM data pertain to image pre-processing and image size.
+
+  The first refers to image reconstruction and its validation and is similar
+  in concept to validation one ought to perform to deconvolved widefield
+  images. The later refers to the increased image size which require
+  careful thought on the implementation of the analysis algorithms,
+  increasingly powerful computers, or free time to wait for the
+  computations to end.
+
+
+  \subsection{Pre-processing}
+    The output from SIM reconstruction is an image with negative values
+    and floating point format.  These are valid values for an image and
+    the typical mathematical operations involved in image analysis but
+    the tools used to perform them are often unable to handle them,
+    effectively forcing them to a conversion into an integer format.
+
+    \todo{test in ImageJ if values are casted or rounded for the
+          16bit conversion.}
+    \todo{should we discuss meaning of negative values?}
+    \todo{check if there's any reconstruction software that performs
+          this reconstruction automatically and does not give the
+          original reconstructed data}
+
+    Such conversion is typically performed by simply casting all values
+    into unsigned 16-bit integers (range 0--65535) which sets all negative
+    values to zero. An alternative method is to use the mode of the pixel
+    values.  This has the assumption that the largest group of pixels in
+    the image are background pixels and that reconstructed pixel values
+    are not intensity and require correction.
+
+    \todo{is it worth discussing rescaling data? I guess it's technically
+          correct but does anyone do it?}
+    \todo{we should make reference to SIMcheck but that needs to get
+          published first.}
+
+    Whatever the method chosen, it is important to keep the original data.
+    The conversion to integers leads to loss of information and is not
+    required for the analysis, it is only a limitation of some tools.
+
+    \begin{figure}
+      \missingfigure{histogram display of the different scale methods}
+    \end{figure}
+
+
+  \subsection{Count of foci / Identification of objects}
+    Among the most typical image analysis is counting the number of foci
+    in a cell.  The techniques used to segment individual objects in other
+    images will work equally well in SIM data.  They might actually work
+    better  due to the increased resolving power.  \todo{I guess it is
+    possible that polyclonal antibodies will fail for large complexes.}
+
+    We have routinely analysed histone PTM foci and proteins from the NPC
+    in SIM data by watershed, local maxima, and automatic threshold, none
+    of which are new in the image analysis field.  Our method (source code
+    available as supplementary data and online --- link to our github clone),
+    follows the following logic:
+
+    \begin{enumerate}
+      \item Creation of nuclear mask on DAPI channel;
+      \begin {enumerate}
+        \item grayscale dilation to fill low-values / IC space;
+        \item automatic threshold by Otsu's method based on the whole
+              histogram.  It is important to not perform one per Z slice
+              otherwise the top and bottom slices do not catch the cell
+              ``caps'';
+        \item fill object holes;
+        \item filter of small objects;
+      \end{enumerate}
+
+      \item foci segmentation on each individual nuclear masks;
+      \begin {enumerate}
+        \item automatic threshold by Otsu's method to identify the nuclear
+              background.  The histogram used is from the pixels in the
+              nuclear mask and not the whole image otherwise there would be
+              3 pixel populations: the image background, nuclear background,
+              and foci.  \todo{check Antti Niemistö work, there may be
+              alternative threshold algorithms that could be used instead}.
+        \item set nuclear background to the image type minimum value;
+        \item watershed of the image complement;
+        \item set watershed lines to the image type minimum value;
+        \item count the leftovers connected components.
+      \end{enumerate}
+    \end{enumerate}
+
+
+  \subsection{Analysis of foci / objects}
+
+
+  \subsection{Colocalization}
+    Colocalization is likely to be the technique that will require more
+    changes on image analysis but the problem is on the concept of
+    colocalization itself.  One of the common methods is measuring
+    co-occurrence which is defined by the presence in the same pixel of
+    two signals.  However, as the resolving power increases, signals should
+    never colocalize.  A perfect example of this is labelling of the same
+    protein with two different antibodies to find they do not
+    colocalize\todo{has Lothar published this?}.
+
+    To make use of the same analysis method as before, one can simply perform
+    a blurring of the super-resolution images.  However, this defeats the
+    whole point of using super-resolution microscopy in the first place.
+
+    A more elegant approach for the case of protein foci is the study of
+    distances between the objects.  \todo{we should reference and summarize
+    the paper on graph theory applied to microscopy once it gets published}.

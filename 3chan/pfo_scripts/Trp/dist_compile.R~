@@ -1,0 +1,156 @@
+#!/usr/bin/env Rscript
+##
+## Copyright (C) 2016 Ezequiel Miron <eze.miron@bioch.ox.ac.uk>
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+dirchosen <- setwd("home/eze/Documents/papers/chrom_marks/results/")
+setwd(dirchosen)
+
+distributions <- list.files(pattern="distn.csv", recursive=TRUE)
+fullcompile <- read.csv(distributions[1])
+fullcompile$Sphase = strsplit(distributions[1], "/")[[1]][1]
+fullcompile$timecourse = strsplit(distributions[1], "/")[[1]][2]
+fullcompile$cell = strsplit(distributions[1],"/")[[1]][3]
+
+for( i in 2:length(distributions)) {
+	comp <-  read.csv(distributions[i])
+	comp$Sphase = strsplit(distributions[i], "/")[[1]][1]
+	comp$timecourse = strsplit(distributions[i], "/")[[1]][2] 
+	comp$cell = strsplit(distributions[i],"/")[[1]][3]
+	fullcompile <- rbind(fullcompile, comp)
+}
+
+table(fullcompile[which(fullcompile$class==1), "Sphase"])
+table(paste0(fullcompile[which(fullcompile$class==1), "Sphase"], fullcompile[which(fullcompile$class==1),"timecourse"]))
+
+write.csv(fullcompile, file="/home/eze/Documents/papers/chrom_marks/results/fullcompile.csv")
+
+
+ClassMean <- c(unlist(by(fullcompile$classnumn, paste0(fullcompile$class,"_", fullcompile$Sphase, "_",fullcompile$timecourse), mean, na.rm=TRUE)))
+ClassSd <- c(unlist(by(fullcompile$classnumn, paste0(fullcompile$class,"_",fullcompile$Sphase,"_",fullcompile$timecourse), sd, na.rm=TRUE)))
+if(all(names(ClassMean) == names(ClassSd))) {
+	Class <- data.frame(Mean=ClassMean, Sd=ClassSd)
+	Class$SPhase =sapply(strsplit(rownames(Class), "_"), "[[",2)
+	Class$Compaction = sapply(strsplit(rownames(Class), "_"), "[[",1)
+	Class$Chase = sapply(strsplit(rownames(Class), "_"), "[[",3)
+}
+
+Class2 <- Class[which(Class$SPhase=="early"), ]
+p <- ggplot(Class2) + 
+geom_bar(aes(x=Compaction, fill=Chase, y=Mean), stat="identity", position=position_dodge(1))+
+geom_errorbar(aes(x=Compaction, fill=Chase, ymin=Mean-Sd, ymax=Mean+Sd), position=position_dodge(1)) + 
+theme(panel.background=element_blank())+
+labs(fill="Length of \nChase",
+	x="Chromatin Compaction Class",
+	y="Proportion of Nucleus" ) + 
+ggtitle("Early")
+
+pdf("early.pdf")
+p
+dev.off()
+
+fullcompile$timecourse <- gsub("C$", "", fullcompile$timecourse)
+fullcompile$timecourse <- gsub("^10mP", "", fullcompile$timecourse)
+fullcompile$timecourse <- factor(fullcompile$timecourse, levels=c("0m", "30m", "1h", "2h", "3h"))
+
+fullcompile2 <- fullcompile[which(fullcompile$Sphase=="early"),]
+p <- ggplot(fullcompile2, aes(x=as.character(class), y=classnumn, fill=timecourse)) + 
+geom_boxplot() + 
+labs(x="Chromatin Compaction", 
+	y="Nuclear Volume (Voxels)", 
+	fill="Chase Length") +
+scale_fill_grey()+
+ggtitle("Early S-Phase") + 
+theme(panel.background=element_blank())
+
+pdf("early.pdf")
+p
+dev.off()
+
+
+COMPACTION<-c("7")
+fullcompile2 <- fullcompile[which(fullcompile$class==COMPACTION),]
+p <- ggplot(fullcompile2, aes(x=Sphase, y=classnumn, fill=timecourse)) +
+geom_boxplot() +
+labs(x="S-Phase State",
+        y="Nuclear Volume (Voxels)",
+        fill="Chase Length") +
+scale_fill_grey()+
+ggtitle(paste0("Chromatin Compaction: ", COMPACTION)) +
+theme(panel.background=element_blank())
+
+savename <- paste0("Compaction",COMPACTION,".pdf")
+pdf(savename)
+p
+dev.off()
+
+
+Class2 <- Class[which(Class$SPhase=="late"), ]
+p <- ggplot(Class2) +
+geom_bar(aes(x=Compaction, fill=Chase, y=Mean), stat="identity", position=position_dodge(1))+
+geom_errorbar(aes(x=Compaction, fill=Chase, ymin=Mean-Sd, ymax=Mean+Sd), position=position_dodge(1)) +
+theme(panel.background=element_blank())+
+labs(fill="Length of \nChase",
+        x="Chromatin Compaction Class",
+        y="Proportion of Nucleus" ) + 
+ggtitle("Late S-Phase")
+
+pdf("Late.pdf")
+p
+dev.off()
+
+
+CHASE <- c("0m")
+fullcompile2 <- fullcompile[which(fullcompile$timecourse==CHASE),]
+fullcompile2$Sphase <- factor(fullcompile2$Sphase, levels=c("early", "mid", "late"))
+p <- ggplot(fullcompile2, aes(x=as.character(class), y=classnumn, fill=Sphase)) +
+geom_boxplot() +
+labs(x="Chromatin Compaction",
+        y="Nuclear Volume (Voxels)",e
+        fill="Chase Length") +
+ggtitle(paste0(CHASE, "chase")) +
+theme(panel.background=element_blank())
+savename <- paste0(CHASE, "Chase.pdf")
+
+pdf(savename)
+p
+dev.off()
+
+
+fullcompile$cellID <- rep(seq(from=1, to=nrow(fullcompile)/7,), each =7)
+volumes <- c(unlist(by(fullcompile$classnum, fullcompile$cellID, sum)))
+fullcompile$volumes <- rep(0, nrow(fullcompile))
+for(i in unique(fullcompile$cellID)) {
+	fullcompile[which(fullcompile$cellID == i), "volumes"] <- volumes[i]
+}
+fullcompile$timecourse <- gsub("10mP", "", fullcompile$timecourse)
+fullcompile$timecourse <- gsub("C", "", fullcompile$timecourse) 
+fullcompile1 <- fullcompile[which(fullcompile$class==1),]
+volmean <- c(unlist(by(fullcompile1$classnum, paste0(fullcompile1$timecourse, "_", fullcompile1$Sphase), mean, na.rm=TRUE)))
+volsd <- c(unlist(by(fullcompile1$classnum, paste0(fullcompile1$timecourse, "_", fullcompile1$Sphase), sd, na.rm=TRUE)))
+vols <- data.frame(Mean=volmean, Sd=volsd)
+vols$timecourse <- sapply(strsplit(rownames(vols), "_"), "[[",1)
+vols$Sphase <- sapply(strsplit(rownames(vols), "_"), "[[",2)
+
+vols$timecourse <- factor(vols$timecourse, levels=c("0m", "30m", "1h", "2h", "3h"))
+p<- ggplot(vols) +
+geom_bar(aes(x=Sphase, y=Mean, fill=timecourse), position=position_dodge(1), stat="identity") + 
+geom_errorbar(aes(x=Sphase, ymax=Mean+Sd, ymin=Mean-Sd, fill=timecourse), position=position_dodge(1))
+
+pdf("volumes2.pdf")
+p
+dev.off()

@@ -1,0 +1,52 @@
+## All the side effect files that can come from building latex project.
+*.acn
+*.acr
+*.alg
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.maf
+*.mtc
+*.mtc0
+*.nav
+*.nlo
+*.out
+*.pdf
+*.pdfsync
+*.ps
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdy
+*.tdo
+
+## Mac hidden files.
+.DS_Store
+
+##Image files and tables
+*.tif
+*.csv
+
+## Do not commit figures, or results accidentally.
+figures/*
+2chan/results/*
+3chan/results/*
+
+## Also do not commit data.  These are really big files and are supposed
+## to just be dropped there (maybe we can use omero to download them).
+2chan/data/*
+3chan/data/*

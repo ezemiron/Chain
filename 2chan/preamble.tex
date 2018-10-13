@@ -1,0 +1,20 @@
+\usepackage[utf8]{inputenc}
+\counterwithout{section}{chapter}
+\DoubleSpacing
+
+\usepackage[T1]{fontenc}
+\usepackage{palatino}
+
+\usepackage[final]{graphicx}
+\graphicspath{{./figures/}}
+
+%% remove colorlinks when preparing for print
+\usepackage[final,hyperindex,hyperfootnotes,bookmarksnumbered,colorlinks]{hyperref}
+
+\usepackage{url}
+\usepackage[textsize=footnotesize]{todonotes}
+%% new command for box about missing references
+\newcommand{\addref}[1][]{\todo[color=red!40,size=\tiny]{Add reference: #1}}
+
+\usepackage{natbib}
+
