@@ -1,0 +1,534 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Made with Remarkable!
+  </title>
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/styles/github.min.css" rel="stylesheet"/>
+  <style type="text/css">
+   body,table tr{background-color:#fff}table tr td,table tr th{border:1px solid #ccc;text-align:left;padding:6px 13px;margin:0}pre code,table,table tr{padding:0}hr,pre code{background:0 0}body{font:16px Helvetica,Arial,sans-serif;line-height:1.4;color:#333;word-wrap:break-word;padding:10px 15px}strong,table tr th{font-weight:700}h1{font-size:2em;margin:.67em 0;text-align:center}h2{font-size:1.75em}h3{font-size:1.5em}h4{font-size:1.25em}h1,h2,h3,h4,h5,h6{font-weight:700;position:relative;margin-top:15px;margin-bottom:15px;line-height:1.1}h1,h2{border-bottom:1px solid #eee}hr{height:0;margin:15px 0;overflow:hidden;border:0;border-bottom:1px solid #ddd}a{color:#4183C4}a.absent{color:#c00}ol,ul{padding-left:15px;margin-left:5px}ol{list-style-type:lower-roman}table tr{border-top:1px solid #ccc;margin:0}table tr:nth-child(2n){background-color:#aaa}table tr td :first-child,table tr th :first-child{margin-top:0}table tr td:last-child,table tr th :last-child{margin-bottom:0}img{max-width:100%}blockquote{padding:0 15px;border-left:4px solid #ccc}code,tt{margin:0 2px;padding:0 5px;white-space:nowrap;border:1px solid #eaeaea;background-color:#f8f8f8;border-radius:3px}pre code{margin:0;white-space:pre;border:none}.highlight pre,pre{background-color:#f8f8f8;border:1px solid #ccc;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px;border-radius:3px}
+  </style>
+ </head>
+ <body>
+  <h1 id="chain-chain-analysis-of-the-in-situ-nucleome">
+   Cha
+   <em>
+    i
+   </em>
+   N - Cha
+   <em>
+    i
+   </em>
+   N analysis of the
+   <em>
+    in situ
+   </em>
+   Nucleome
+  </h1>
+  <h2 id="what">
+   What?
+  </h2>
+  <p>
+   A tool to dissect the spatial distribution of the mammalian nucleome relative to chromatin from super resolution 3D structured illumination microscopy (3D SIM) data. This tool was developed as part of my doctoral thesis and was used in a related publication.
+  </p>
+  <h2 id="where">
+   Where?
+  </h2>
+  <p>
+   The original versions of Cha
+   <em>
+    i
+   </em>
+   N are currently in the Oxford biochemistry Micron servers under
+   <code>
+    wolf4192/Chain/
+   </code>
+   <br/>
+   And in github:
+   <a href="mailto:git@github.com">
+    git@github.com
+   </a>
+   :ezemiron/Chain.git
+   <br/>
+   <a href="https://github.com/ezemiron/Chain.git">
+    https://github.com/ezemiron/Chain.git
+   </a>
+  </p>
+  <p>
+   One version exists for 2 Channel data with chromatin in second channel and spots channel in first
+   <br/>
+   and another version for 3 channel data, with chromatin in third channel and spots channel in first and second and channel.
+  </p>
+  <h5 id="older-versions">
+   Older versions:
+  </h5>
+  <p>
+   Only for 2 channels:
+   <br/>
+   <code>
+    wolf4192/backup-chain/eze7134/Documents/papers/chrom_marks/
+   </code>
+  </p>
+  <h3 id="requirements-and-set-up">
+   Requirements and set up
+  </h3>
+  <p>
+   First you should check you have all the necessary…
+  </p>
+  <h4 id="r-at-least-r-33">
+   R:     at least R 3.3
+  </h4>
+  <pre><code>bioimagetools: (source code: https://r-forge.r-project.org/R/?group_id=1143 )
+
+ $ R
+    R version 3.3.3 (2017-03-06) -- "Another Canoe"
+    Copyright (C) 2017 The R Foundation for Statistical Computing
+    Platform: x86_64-pc-linux-gnu (64-bit)
+    [...]
+    &gt; setRepositories(ind=c(1,2))
+    &gt; install.packages("bioimagetools")
+    Installing package into ‘/usr/local/lib/R/site-library’
+    (as ‘lib’ is unspecified)
+    Warning in install.packages("bioimagetools") :
+      'lib = "/usr/local/lib/R/site-library"' is not writable
+    Would you like to use a personal library instead?  (y/n) y
+    Would you like to create a personal library
+    ~/R/x86_64-pc-linux-gnu-library/3.3
+    to install packages into?  (y/n) y
+    --- Please select a CRAN mirror for use in this session ---
+    [...]
+    Selection: 67
+    also installing the dependencies ‘jpeg’, ‘locfit’, ‘fftwtools’, ‘tiff’, ‘EBImage’
+    [...]
+    * DONE (bioimagetools)
+    [...]
+    &gt; library('bioimagetools')
+    Bioimagetools 1.1.3
+</code></pre>
+  <h4 id="octave-at-least-octave-403">
+   Octave: at least Octave 4.0.3
+  </h4>
+  <pre><code>Octave packages:
+Octave-image 2.6.1
+Octave-statistics 1.3.0
+</code></pre>
+  <h4 id="bioformats">
+   Bioformats:
+  </h4>
+  <pre><code>wget https://downloads.openmicroscopy.org/bio-formats/5.9.2/artifacts/bioformats-octave-5.9.2.tar.gz
+    octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
+</code></pre>
+  <h4 id="java">
+   Java:
+  </h4>
+  <p>
+   Need to also make a text file in your home:
+   <code>
+    ~/javaclasspath.txt
+   </code>
+   <br/>
+   with this inside:
+   <code>
+    /usr/local/share/java/bioformats_package.jar
+   </code>
+   <br/>
+   To guide bioformats to the location of the bioformats_package.jar located on the machine.
+   <br/>
+   If you are doing this on your own machine the PATH you write inside the javaclasspath file will change.
+  </p>
+  <h4 id="graphicsmagick-1323">
+   GraphicsMagick-1.3.23
+  </h4>
+  <p>
+   A library for working with images.
+  </p>
+  <blockquote>
+   <h4 id="misc">
+    Misc
+   </h4>
+   <p>
+    There is a chance I’ve forgotten some basic library in this brief desciption.
+    <br/>
+    Basically if Cha
+    <em>
+     i
+    </em>
+    N complains at the start because it requires a library it should tell you what is missing.
+   </p>
+  </blockquote>
+  <h2 id="how-to-chain">
+   How to Cha
+   <em>
+    i
+   </em>
+   N:
+  </h2>
+  <p>
+   Lemme show you. You’ll need two types of
+   <em>
+    “raw”
+   </em>
+   data.
+   <br/>
+   Files ending in
+   <code>
+    *SIR_THR_ALN.tif
+   </code>
+   &amp;
+   <code>
+    ALN_MCNR-mask.tif
+   </code>
+   <br/>
+   These are not true raw
+   <code>
+    .tif
+   </code>
+   files. The first is the reconstructed raw (SIR) which has been processed by the script
+   <code>
+    16THR.ijm
+   </code>
+   . This is an custom ImageJ macro for Fiji which utilises the
+   <strong>
+    SIMcheck
+   </strong>
+   plugging from Micron to threshold the image to the modal value (assumed to be background) and converts the image to a 16 bit tiff.
+  </p>
+  <p>
+   In the process it also uses the true raw for
+   <strong>
+    SIMcheck
+   </strong>
+   to generate a modulation contrast map, the second file required.
+  </p>
+  <p>
+   Both files need to be aligned, currently using
+   <strong>
+    Chromagnon
+   </strong>
+   .
+  </p>
+  <h3 id="where-is-the-raw-data">
+   Where is the raw data?
+  </h3>
+  <p>
+   The raw data is far too large to keep under version control (each SIM result is around 150MB after conversion to 16bit). At the moment it is assumed that the files exist in the
+   <code>
+    /data
+   </code>
+   directory but we will come up with something better later. Maybe using our omero server to serve this files. To meet this assumption currently you just have to copy the data to be processed into the actual Cha
+   <em>
+    i
+   </em>
+   n
+   <code>
+    /data
+   </code>
+   directory.
+   <br/>
+   The output will be in the Cha
+   <em>
+    i
+   </em>
+   n
+   <code>
+    /results
+   </code>
+   directory.
+  </p>
+  <blockquote>
+   <p>
+    Previously when Cha
+    <em>
+     i
+    </em>
+    N was in a different machine than the micron server, data was mounted as read only using
+    <code>
+     sshfs
+    </code>
+    from whichever directory it was in, into Cha
+    <em>
+     i
+    </em>
+    N’s
+    <code>
+     /data
+    </code>
+    directory.
+    <br/>
+    Can’t use
+    <code>
+     sshfs
+    </code>
+    because 2125 does not have it installed
+    <br/>
+    Can’t used mount (below) because I need to be root.
+    <br/>
+    This mounting does not currently work:
+    <br/>
+    Mount data as read-only
+    <br/>
+    <code>
+     $ mount -Br ~/path/to/data ~/Chain/2chan/data
+    </code>
+    <br/>
+    Mount results
+    <br/>
+    <code>
+     mount -B ~/path/to/results ~/Chain/2chan/results
+    </code>
+   </p>
+  </blockquote>
+  <h3 id="how-to-structure-and-name-raw-data">
+   How to structure and name raw data
+  </h3>
+  <p>
+   The raw data to be processed by Cha
+   <em>
+    i
+   </em>
+   N can be organised in whatever architecture is required. The results data will be saved in an architecture mimicking that of the input.
+   <br/>
+   However, for ease of compiling al results
+   <code>
+    *.csv
+   </code>
+   tables afterwards it is recommeded to organise the data under the following structure:
+   <code>
+    /data/cell-type/exp-condition/chrom-marker
+   </code>
+   . eg:
+   <code>
+    /data/C127/G1/CTCF
+   </code>
+  </p>
+  <p>
+   Make sure that the name of the directories is the same as the tags included in the file name:
+   <br/>
+   <code>
+    [experiment-code]_[microscope-slide-number]_[cell-type]_[experimental-condition]_[acquisition-oil]_[wavelength]_[chromatin-marker]_[acquisition-number]_[FILE-TYPE]
+   </code>
+   <br/>
+   i.e., for the previous example, a file would be:
+   <br/>
+   <code>
+    2018-07-03_1_C127_Trip_G1_514_Scc1-488_CTCF-594_04_SIR_THR_ALN.tif
+   </code>
+  </p>
+  <h3 id="tweaking-makefile-when-required">
+   Tweaking Makefile when required
+  </h3>
+  <blockquote>
+   <p>
+    If you can help it, don’t do it.
+   </p>
+  </blockquote>
+  <p>
+   Currently need to copy all of G1 data from all the trip directories in bioc1090/data which also end in the “
+   <em>
+    SIR_THR_ALN.tif” and “
+   </em>
+   MCNR-mask.tif”:
+  </p>
+  <p>
+   find LS2018-07-03_1_C127_Trip/ -type f ( -name “
+   <em>
+    G1
+   </em>
+   ” -and ( -name “
+   <em>
+    SIR_THR_ALN.tif” -or -name “
+   </em>
+   MCNR-mask.tif” ) ) -exec cp {} ~/papers/data/C127/Trip \;
+  </p>
+  <p>
+   Then need to scp to a machine that can run Fiji to open all and save them as tifs again in imageJ with a OS.ijm macro.
+  </p>
+  <p>
+   Then scp to copy them back to data in Cha
+   <em>
+    i
+   </em>
+   n.
+  </p>
+  <h3 id="final-data-management">
+   Final data management
+  </h3>
+  <p>
+   After processing with Cha
+   <em>
+    i
+   </em>
+   N the
+   <code>
+    /results
+   </code>
+   directory (with any created sub directories) will be filled with the output files from the image analysis.
+  </p>
+  <p>
+   Do
+   <code>
+    make distribution
+   </code>
+   (or
+   <code>
+    make -j8 distribution
+   </code>
+   for parallelization)
+   <br/>
+   make d2b
+   <br/>
+   make d2bfit
+   <br/>
+   make d2bnorm
+  </p>
+  <p>
+   Then to aggregate the distribution and network data:
+   <br/>
+   Summary.R
+   <br/>
+   spot-class-count.R
+   <br/>
+   dist_compile.R
+   <br/>
+   SA2vol.R
+  </p>
+  <p>
+   To aggregate d2b data:
+   <br/>
+   summaryd2b.R
+   <br/>
+   d2b_compile.R
+  </p>
+  <h3 id="making-plots">
+   Making plots:
+  </h3>
+  <p>
+   Below are the scripts used to generate the graphs in the paper. These scripts cannot be run from terminal as Rscript [path-to-script].
+   <br/>
+   They should be opened in R (or R studio) to asses them. They are all comprised of multiple semgents each outputting different kind of graphs and requiring input of different data.
+  </p>
+  <h4 id="batch-distn-barplotsr">
+   batch-distn-barplots.R
+  </h4>
+  <p>
+   Required packages:
+  </p>
+  <pre><code>    ggplot2
+    reshape2
+</code></pre>
+  <ul>
+   <li>
+    Automatically produce a barplot for each marker of its enrichment/depletion in each chromatin class ([condition]_distn-compile*.csv).
+   </li>
+   <li>
+    Depending on the ggplot used and data uploaded the barplots can be for single condition or multiple conditions in parallel.
+   </li>
+   <li>
+    Groups of markers can also be plotted in parallel for a single conditions (to group by function)
+   </li>
+   <li>
+    Bar plots of WF vs SIR enrichment/depletion data for controls (“WF-distribution-summary.csv”).
+   </li>
+  </ul>
+  <h4 id="heatmaplutr">
+   heatmapLUT.R
+  </h4>
+  <p>
+   Required packages:
+  </p>
+  <pre><code>    ggplot2
+    scales
+    RColorBrewer
+</code></pre>
+  <ul>
+   <li>
+    This will produce the heatmaps with the corrected loops (for extreme values)
+   </li>
+   <li>
+    The variety of small ggplots to choose from include all markers for a single condition. or comparing across conditions in different panels etc.
+   </li>
+   <li>
+    It requires the type of file with the density distributions for all markers: [condition]_distn-compile*.csv (eg: G1_distn-compile_volnormE_Final.csv)
+   </li>
+  </ul>
+  <h4 id="distance-plotsr">
+   distance-plots.R
+  </h4>
+  <p>
+   Required packages:
+  </p>
+  <pre><code>    ggplot2
+    RColorBrewer
+</code></pre>
+  <ul>
+   <li>
+    This will produce the dot plot of distance from IC surface for all markers in a single condition or multiple conditions in parallel.
+   </li>
+   <li>
+    It requires the type of file with the distances for each marker: [condition]_md2b-compile*. (eg: csv G1_md2b-compile_Final.csv)
+   </li>
+  </ul>
+  <h4 id="savolboxr">
+   SAvolbox.R
+  </h4>
+  <p>
+   Required packages:
+  </p>
+  <pre><code>    ggplot2
+    RColorBrewer
+    reshape2
+    dplyr
+</code></pre>
+  <ul>
+   <li>
+    Box or violin plots of SA:vol ratios distribution (C127_[G1/NaN3/Hyper-os/Trip]_SA2vol_raw_Final.csv).
+   </li>
+   <li>
+    Dot plot of mean SA:vol with 95CI (C127_[G1/NaN3/Hyper-os/Trip]_SA2vol_raw_Final.csv).
+   </li>
+   <li>
+    Box or violin of chromatin vol:nuclear vol (C127_[G1/NaN3/Hyper-os/Trip]_SA2vol_raw_Final.csv).
+   </li>
+   <li>
+    Box or violin of whole nuclear volume (C127_[G1/NaN3/Hyper-os/Trip]_SA2vol_raw_Final.csv).
+   </li>
+   <li>
+    Changes of volumes for each density class as absolute values or normalised to nuclear volume for G1 or Sphase ([G1/ES/MS/LS]_distn-compile.csv”).
+   </li>
+   <li>
+    Remodeller size to marker distn (from remod-size-table_Final.csv).
+   </li>
+   <li>
+    Bar plots of WF vs SIR chromatin data for controls (“WF-distribution-summary.csv”).
+   </li>
+  </ul>
+  <h4 id="network-dimsr">
+   network-dims.R
+  </h4>
+  <p>
+   Required packages:
+  </p>
+  <pre><code>    ggplot2
+    plyr
+</code></pre>
+  <ul>
+   <li>
+    To plot changes in each chromatin network size as continuous line (G1_network-compile.csv)
+   </li>
+   <li>
+    To work out the network radius from a tubular model and plot the radius as point with 95CI bars or the network diameter
+   </li>
+  </ul>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js">
+  </script>
+  <script>
+   hljs.initHighlightingOnLoad();
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+   MathJax.Hub.Config({"showProcessingMessages" : false,"messageStyle" : "none","tex2jax": { inlineMath: [ [ "$", "$" ] ] }});
+  </script>
+ </body>
+</html>
