@@ -105,6 +105,12 @@ In the Cha*i*N directory there is a file called `Makefile` with the instructions
 Furthermore the `Makefile` has instructions to look for the files appropriate `.tif` files (as mentioned previously) in the `/data` directory. It will mimick the subdirectory architecture when saving all output files to the `/results` directory.
 On top of this, the relationship between the ouptut of some of the scripts as inputs for others downstream is coded in the makefile, such that **Make** can generate all required intermediate files if asked for an ouptut.
 If running this analysis on a machine with enough memory and ram to handle paralleled image processing **Make** is also able to parallelize jobs, greatly reducing the time required for processing large numbers of images.
+>	$ make command
+or
+	
+>	$ make -j**n** command
+
+>where **n** is the number of parallel jobs requred
 
 Finally **Make** is able to recognize when files have been processed already do calling a function twice does not result in unnecessary processing of the same data that had previously been analysed. Only new data will be processed.
 
@@ -114,15 +120,47 @@ The `Makefile` includes a short guideline of the analyses available which can be
 
 Here are some examples of how to process files:
 
+####Nucleus mask
+	$ make mask
+
+
+Will process all files...
+####Replication mask
+	$ make submask
+	
+
+Will process all files...
+####Chromatin density segmentation
+	$ make segmented-chromatin
+	
+
+Will process all files...
+####Centroids
+	$ make centroids
+	
+
+Will process all files...
 ####Density ditributions
 	$ make distributions
 	
->or
-	$ make -j**n** distributions
-
->where **n** is the number of parallel jobs requred
 
 Will process all files...
+####Chromatin-IC boundaries
+	$ make boundaries
+	
+
+Will process all files...
+####Distanes to 
+	$ make distributions
+	
+
+Will process all files...
+####Density ditributions
+	$ make distributions
+	
+
+Will process all files...
+
 
 ### Tweaking Makefile when required
 >If you can help it, don't do it.
