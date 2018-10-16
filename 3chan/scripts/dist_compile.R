@@ -88,6 +88,6 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
         dfA <- dfA[2:nrow(dfA),]
         names(dfA) <- c("condition","Marker", "class", "Log2AvNorm","lowLogErr","uprLogErr","spotnum","spotnumn","classnum","classnumn","numofcells")
 
-        savename  <- paste0(con_name,"_distn-compile_volnorm1.csv")
+        savename  <- paste0(con_name,"_distn-compile_volnorm.csv")
         write.csv(dfA,savename);
   }

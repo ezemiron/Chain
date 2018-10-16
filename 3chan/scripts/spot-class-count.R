@@ -24,7 +24,7 @@ dirchosen <- getwd()
 
 
 Cell = "C127"
-Condition = "MS"
+Condition = "Trip"
 
 topPATH = paste(Cell, Condition, sep = "/")
 
