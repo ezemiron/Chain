@@ -146,21 +146,22 @@ Will process all files...
 
 Will process all files...
 ####Chromatin-IC boundaries
-	$ make boundaries
+	$ make 
 	
 
 Will process all files...
-####Distanes to 
-	$ make distributions
+####Distances to 
+	$ make 
 	
 
 Will process all files...
 ####Density ditributions
-	$ make distributions
+	$ make d2b
 	
 
 Will process all files...
-
+make d2bfit
+make d2bnorm
 
 ### Tweaking Makefile when required
 >If you can help it, don't do it.
@@ -176,21 +177,19 @@ Then scp to copy them back to data in Cha*i*n.
 ### Final data management
 After processing with Cha*i*N the `/results` directory (with any created sub directories) will be filled with the output files from the image analysis.
 
-Do `make distribution` (or `make -j8 distribution` for parallelization)
-make d2b
-make d2bfit
-make d2bnorm
+Then to aggregate the distribution and network data employ these scipts from the directory where the makefile is, in this order:
 
-Then to aggregate the distribution and network data:
-Summary.R
-	spot-class-count.R
-		dist_compile.R
-		SA2vol.R
+* Summary.R
+	* spot-class-count.R
+		* dist_compile.R
+			* SA2vol.R
 
 To aggregate d2b data:
-summaryd2b.R
-	d2b_compile.R
 
+* summaryd2b.R
+	* d2b_compile.R
+
+For changes in cell type and condition each script needs to be manually adjusted by changing those variables at the beginning of the script.
 
 ###Making plots: 
 Below are the scripts used to generate the graphs in the paper. These scripts cannot be run from terminal as Rscript [path-to-script]. 

@@ -17,12 +17,11 @@
 
 
 
-dirchosen  <- readline(prompt = "This script should be run from the results directory as the working directory. \n  ie: \"~/Documents/papers/chrom_marks/results\".\nIf already in results directory hit enter\n")
+dirchosen <- readline(prompt = "This script should be run two directories above the marks")
 
 dirchosen <- getwd()
 
 celltype = "C127"
-
 
 topdir_names <- list.dirs(celltype, recursive = FALSE)
 #topdir_names <- topdir_names[2:length(topdir_names)]
@@ -42,7 +41,7 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
 
     df <- data.frame(NA)
     names(df) <- NA
-    dfA <- cbind(df,df,df,df,df,df,df,df,df)
+    dfA <- cbind(df,df,df,df,df,df,df,df,df,df,df)
     dirchosen2 <- getwd()
 
     for (dir_name in dir_names){
@@ -59,7 +58,7 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
         distnsum  <- grep("*_distn-summary.csv",allfilesandpaths, value = TRUE)
 
         if (length(distnsum) > 0){
-          spotsum <- sub ("distn", "spot-class", distnsum)
+          spotsum <- sub ("distn-summary", "spot-class-summary", distnsum)
           
           if (length (which (allfilesandpaths == spotsum))> 0){
             condition <- rep(con_name, 7)
@@ -69,7 +68,7 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
             dfB <- dfB[, c("Marker","class","Log2AvNorm","lowLogErr","uprLogErr")]
 
             dfC <- read.csv(spotsum)
-            dfC <- dfC[, c("spotnum","classnum","numofcells")]
+            dfC <- dfC[, c("spotnum","spotnumn","classnum","classnumn","numofcells")]
 
             dfB <- cbind(condition, dfB, dfC)
             names(dfB) <- rep(NA, ncol(dfB))
@@ -87,11 +86,8 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
 
 #rename
         dfA <- dfA[2:nrow(dfA),]
-        names(dfA) <- c("condition","Marker", "class", "Log2AvNorm","lowLogErr", "uprLogErr", "spotnum", "classnum", "numofcells")
+        names(dfA) <- c("condition","Marker", "class", "Log2AvNorm","lowLogErr","uprLogErr","spotnum","spotnumn","classnum","classnumn","numofcells")
 
-        savename  <- paste0(con_name,"_distn-compile.csv")
+        savename  <- paste0(con_name,"_distn-compile_volnorm1.csv")
         write.csv(dfA,savename);
   }
-
-
-
