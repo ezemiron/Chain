@@ -116,8 +116,8 @@ Octave-statistics 1.3.0
   <h4 id="bioformats">
    Bioformats:
   </h4>
-  <pre><code>wget https://downloads.openmicroscopy.org/bio-formats/5.9.2/artifacts/bioformats-octave-5.9.2.tar.gz
-    octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
+  <pre><code>$ wget https://downloads.openmicroscopy.org/bio-formats/5.9.2/artifacts/bioformats-octave-5.9.2.tar.gz
+$ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
 </code></pre>
   <h4 id="java">
    Java:
@@ -315,8 +315,504 @@ Octave-statistics 1.3.0
     2018-07-03_1_C127_Trip_G1_514_Scc1-488_CTCF-594_04_SIR_THR_ALN.tif
    </code>
   </p>
-  <h3 id="tweaking-makefile-when-required">
-   Tweaking Makefile when required
+  <h3 id="the-makefile">
+   The Makefile
+  </h3>
+  <p>
+   The numerous R and Octave scripts that form the basis of image analysis in this pipeline are managed under the
+   <strong>
+    Make
+   </strong>
+   build system. One can still call up any of these scripts individually to process a single file (or number of files a script requires) but this is not necessary.
+   <br/>
+   In the Cha
+   <em>
+    i
+   </em>
+   N directory there is a file called
+   <code>
+    Makefile
+   </code>
+   with the instructions about what each script requires and what it should output.
+   <br/>
+   Furthermore the
+   <code>
+    Makefile
+   </code>
+   has instructions to look for the files appropriate
+   <code>
+    .tif
+   </code>
+   files (as mentioned previously) in the
+   <code>
+    /data
+   </code>
+   directory. It will mimick the subdirectory architecture when saving all output files to the
+   <code>
+    /results
+   </code>
+   directory.
+   <br/>
+   On top of this, the relationship between the ouptut of some of the scripts as inputs for others downstream is coded in the makefile, such that
+   <strong>
+    Make
+   </strong>
+   can generate all required intermediate files if asked for an ouptut.
+   <br/>
+   If running this analysis on a machine with enough memory and ram to handle paralleled image processing
+   <strong>
+    Make
+   </strong>
+   is also able to parallelize jobs, greatly reducing the time required for processing large numbers of images.
+  </p>
+  <blockquote>
+   <p>
+    $ make command
+    <br/>
+    or
+   </p>
+   <p>
+    $ make -j
+    <strong>
+     n
+    </strong>
+    command
+   </p>
+   <p>
+    where
+    <strong>
+     n
+    </strong>
+    is the number of parallel jobs requred
+   </p>
+  </blockquote>
+  <p>
+   Finally
+   <strong>
+    Make
+   </strong>
+   is able to recognize when files have been processed already do calling a function twice does not result in unnecessary processing of the same data that had previously been analysed. Only new data will be processed.
+  </p>
+  <p>
+   The
+   <code>
+    Makefile
+   </code>
+   includes a short guideline of the analyses available which can be called by:
+   <br/>
+   $ make help
+  </p>
+  <p>
+   Here are some examples of how to process files:
+  </p>
+  <blockquote>
+   <p>
+    Depending on the details of the Makefile the actual file title endings may be slighly differently processed
+   </p>
+  </blockquote>
+  <h4 id="nucleus-mask">
+   Nucleus mask:
+  </h4>
+  <pre><code>$ make mask
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   Reconstructed, thresholded and aligned data.
+  </p>
+  <blockquote>
+   <p>
+    the order of alignment and thresholding has changed due to the alignment software changes, thus files could be
+    <code>
+     *_SIR_THR_ALN.tif
+    </code>
+    or
+    <code>
+     *_SIR_EAL_THR.tif
+    </code>
+    . This
+    <strong>
+     WILL
+    </strong>
+    affect the ability of the Makefile to find these files so the recipes in the Makefile will have to be changed accordingly (see section below).
+   </p>
+  </blockquote>
+  <p>
+   <strong>
+    script:
+   </strong>
+   <code>
+    nucleus_mask.m
+   </code>
+  </p>
+  <p>
+   To make a
+   <code>
+    .tif
+   </code>
+   mask from the chromatin stain which will be the outline of the nucleus.
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_mask.tif
+   </code>
+  </p>
+  <h4 id="replication-mask">
+   Replication mask:
+  </h4>
+  <pre><code>$ make submask
+</code></pre>
+  <p>
+   Will process all
+   <code>
+    EdU
+   </code>
+   files.
+   <br/>
+   To make a
+   <code>
+    .tif
+   </code>
+   mask from the replication regions if required to separate nascent replication from non replicating regions.
+   <br/>
+   Output:
+   <code>
+    *EdU-submask.tif
+   </code>
+  </p>
+  <h4 id="chromatin-density-segmentation">
+   Chromatin density segmentation:
+  </h4>
+  <pre><code>$ make segmented-chromatin
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   <code>
+    results/.../*_mask.tif
+   </code>
+   &amp;
+   <code>
+    data/.../*_SIR_THR_ALN.tif
+   </code>
+   or
+   <code>
+    *_SIR_EAL_THR.tif
+   </code>
+   <br/>
+   <strong>
+    script:
+   </strong>
+   <code>
+    chromseg.R
+   </code>
+   <br/>
+   To make a
+   <code>
+    .tif
+   </code>
+   segmented chromatin landscape, binned into arbitrary classes inside the nuclear mask made from
+   <code>
+    make mask
+   </code>
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_SEG.tif
+   </code>
+  </p>
+  <h4 id="centroids">
+   Centroids:
+  </h4>
+  <pre><code>$ make centroids
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   <code>
+    results/.../*_mask.tif
+   </code>
+   &amp;
+   <code>
+    data/.../*_SIR_THR_ALN.tif
+   </code>
+   or
+   <code>
+    *_SIR_EAL_THR.tif
+   </code>
+   <br/>
+   <strong>
+    script:
+   </strong>
+   <code>
+    foci_centroids.m
+   </code>
+   <br/>
+   To make a
+   <code>
+    .csv
+   </code>
+   file of
+   <code>
+    xyz
+   </code>
+   coordinates of the intensity weighted centroids from IF signals against epigenetic markers.
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_centroids.csv
+   </code>
+  </p>
+  <h4 id="density-ditributions">
+   Density ditributions:
+  </h4>
+  <pre><code>$ make distributions
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   <code>
+    results/.../*_centroids.csv
+   </code>
+   &amp;
+   <code>
+    results/.../*_SEG.tif
+   </code>
+   &amp;
+   <code>
+    data/.../*_MCNR-mask.tif
+   </code>
+   <br/>
+   <strong>
+    script:
+   </strong>
+   <code>
+    distribution.R
+   </code>
+   <br/>
+   To take the centroid coordinates from
+   <code>
+    make centroids
+   </code>
+   and index them on the segmented landscape from
+   <code>
+    make segmented-chromatin
+   </code>
+   , generating a
+   <code>
+    .csv
+   </code>
+   distribution of the number of centroids that fall in each density class.
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_distn.csv
+   </code>
+  </p>
+  <h4 id="chromatin-ic-boundaries">
+   Chromatin-IC boundaries:
+  </h4>
+  <pre><code>$ make boundaries
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   <code>
+    results/.../*_SEG.tif
+   </code>
+   <br/>
+   <strong>
+    script:
+   </strong>
+   <code>
+    bound.m
+   </code>
+   <br/>
+   To take the the segmented landscape from
+   <code>
+    make segmented-chromatin
+   </code>
+   and generate a
+   <code>
+    .tif
+   </code>
+   binary of the boundary between class 1 and all other classes.
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_bound.tif
+   </code>
+  </p>
+  <h4 id="distances-to-boundaries">
+   Distances to boundaries:
+  </h4>
+  <pre><code>$ make d2b
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   <code>
+    results/.../*_centroids.csv
+   </code>
+   &amp;
+   <code>
+    results/.../*_bound.tif
+   </code>
+   &amp;
+   <code>
+    results/.../*_masktif
+   </code>
+   <br/>
+   <strong>
+    script:
+   </strong>
+   <code>
+    d2bound.m
+   </code>
+   <br/>
+   To take the centroid coordinates from
+   <code>
+    make centroids
+   </code>
+   and run a nearest neighbour eucledian algorithm to voxels in the segmented boundaires from
+   <code>
+    make boundaries
+   </code>
+   , generating a
+   <code>
+    .csv
+   </code>
+   distribution of the number of centroids that fall in each density class (
+   <em>
+    md2b
+   </em>
+   ).
+   <br/>
+   This is also repeated for a random sample of centroids (same number as those for the biological marker) to get a baseline for the random distribution (
+   <em>
+    rd2b
+   </em>
+   )
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_md2b.csv
+   </code>
+   &amp;
+   <code>
+    *_rd2b.csv
+   </code>
+  </p>
+  <h4 id="distance-fit-to-model">
+   Distance fit to model
+  </h4>
+  <pre><code>$ make d2bfit
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   <code>
+    results/.../*_md2b.csv
+   </code>
+   &amp;
+   <code>
+    results/.../*_rd2b.csv
+   </code>
+   <br/>
+   <strong>
+    script:
+   </strong>
+   <code>
+    nucleus_mask.m
+   </code>
+   <br/>
+   To use a least squares regression to fit a
+   <em>
+    mu
+   </em>
+   and
+   <em>
+    sigma
+   </em>
+   for the available distances of the marker and the random sample from
+   <code>
+    make d2b
+   </code>
+   .
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_d2bfit.csv
+   </code>
+  </p>
+  <h4 id="distances-normalized">
+   Distances normalized
+  </h4>
+  <pre><code>$ make d2bnorm
+</code></pre>
+  <p>
+   <strong>
+    Input:
+   </strong>
+   <code>
+    results/.../*_d2bfit.csv
+   </code>
+   <br/>
+   <strong>
+    script:
+   </strong>
+   <code>
+    nucleus_mask.m
+   </code>
+   <br/>
+   To make normalised distances
+   <code>
+    make d2b
+   </code>
+   as log2fold enrichment simulated over +/- 400nm from the
+   <em>
+    mu
+   </em>
+   and
+   <em>
+    sigma
+   </em>
+   from
+   <code>
+    make d2bfit
+   </code>
+   .
+   <br/>
+   <strong>
+    Output:
+   </strong>
+   <code>
+    *_d2bnorm.csv
+   </code>
+  </p>
+  <h3 id="tweaking-makefile-whenif-required">
+   Tweaking Makefile (when/if required)
   </h3>
   <blockquote>
    <p>
@@ -351,9 +847,9 @@ Octave-statistics 1.3.0
    </em>
    n.
   </p>
-  <h3 id="final-data-management">
+  <h2 id="final-data-management">
    Final data management
-  </h3>
+  </h2>
   <p>
    After processing with Cha
    <em>
@@ -366,39 +862,166 @@ Octave-statistics 1.3.0
    directory (with any created sub directories) will be filled with the output files from the image analysis.
   </p>
   <p>
-   Do
-   <code>
-    make distribution
-   </code>
-   (or
-   <code>
-    make -j8 distribution
-   </code>
-   for parallelization)
-   <br/>
-   make d2b
-   <br/>
-   make d2bfit
-   <br/>
-   make d2bnorm
+   Then to aggregate the distribution and network data employ these scipts from the directory where the makefile is, in this order:
   </p>
-  <p>
-   Then to aggregate the distribution and network data:
-   <br/>
-   Summary.R
-   <br/>
-   spot-class-count.R
-   <br/>
-   dist_compile.R
-   <br/>
-   SA2vol.R
-  </p>
+  <ul>
+   <li>
+    Summary.R (
+    <strong>
+     input:
+    </strong>
+    <code>
+     *_distn.csv
+    </code>
+    ,
+    <strong>
+     output:
+    </strong>
+    <code>
+     *_distn-summary.csv
+    </code>
+    &amp;
+    <code>
+     *_distn-full.csv
+    </code>
+    )
+    <ul>
+     <li>
+      spot-class-count.R (
+      <strong>
+       input:
+      </strong>
+      <code>
+       *_distn.csv
+      </code>
+      ,
+      <strong>
+       output:
+      </strong>
+      <code>
+       *_spot-class-count.csv
+      </code>
+      &amp;
+      <code>
+       *_spot-class-summaryl.csv
+      </code>
+      )
+      <ul>
+       <li>
+        dist_compile.R (
+        <strong>
+         input:
+        </strong>
+        <code>
+         *_distn-summary.csv
+        </code>
+        &amp;
+        <code>
+         *_spot-class-summary.csv
+        </code>
+        ,
+        <strong>
+         output:
+        </strong>
+        <code>
+         *_distn-compile.csv
+        </code>
+        )
+        <ul>
+         <li>
+          SA2vol.R (
+          <strong>
+           input:
+          </strong>
+          <code>
+           *_spot-class-summary.csv
+          </code>
+          &amp;
+          <code>
+           *_bound.tif
+          </code>
+          ,
+          <strong>
+           output:
+          </strong>
+          <code>
+           *_SA2vol_raw.csv
+          </code>
+          &amp;
+          <code>
+           *_SA2vol_stat.csv
+          </code>
+          &amp;
+          <code>
+           *_chrom2vol_stat.csv
+          </code>
+          )
+         </li>
+        </ul>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
   <p>
    To aggregate d2b data:
-   <br/>
-   summaryd2b.R
-   <br/>
-   d2b_compile.R
+  </p>
+  <ul>
+   <li>
+    summaryd2b.R (
+    <strong>
+     input:
+    </strong>
+    <code>
+     .csv
+    </code>
+    ,
+    <strong>
+     output:
+    </strong>
+    <code>
+     .csv
+    </code>
+    )
+    <ul>
+     <li>
+      d2b_compile.R (
+      <strong>
+       input:
+      </strong>
+      <code>
+       *_network-summary.csv
+      </code>
+      &amp;
+      <code>
+       *_abs-md2b_summary.csv
+      </code>
+      &amp;
+      <code>
+       *_d2bnorm-summary.csv
+      </code>
+      <strong>
+       output:
+      </strong>
+      <code>
+       *_md2b-compile.csv
+      </code>
+      &amp;
+      <code>
+       *_d2bnorm-compile.csv
+      </code>
+      &amp;
+      <code>
+       *_network-compile.csv
+      </code>
+      )
+     </li>
+    </ul>
+   </li>
+  </ul>
+  <p>
+   For changes in cell type and condition each script needs to be manually adjusted by changing those variables at the beginning of the script.
   </p>
   <h3 id="making-plots">
    Making plots:

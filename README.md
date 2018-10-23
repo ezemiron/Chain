@@ -119,51 +119,93 @@ The `Makefile` includes a short guideline of the analyses available which can be
 	$ make help
 
 Here are some examples of how to process files:
+> Depending on the details of the Makefile the actual file title endings may be slighly differently processed
 
-####Nucleus mask
+####Nucleus mask:
 	$ make mask
 
 
-Will process all files...
-####Replication mask
-	$ make submask
-	
+**Input:** Reconstructed, thresholded and aligned data.
+>the order of alignment and thresholding has changed due to the alignment software changes, thus files could be `*_SIR_THR_ALN.tif` or `*_SIR_EAL_THR.tif`. This **WILL** affect the ability of the Makefile to find these files so the recipes in the Makefile will have to be changed accordingly (see section below).
 
-Will process all files...
-####Chromatin density segmentation
+**script:** `nucleus_mask.m`
+
+To make a `.tif` mask from the chromatin stain which will be the outline of the nucleus.
+**Output:**	`*_mask.tif`
+
+####Replication mask:
+	$ make submask
+	 
+
+Will process all `EdU` files.
+To make a `.tif`mask from the replication regions if required to separate nascent replication from non replicating regions.
+Output:	`*EdU-submask.tif`
+
+####Chromatin density segmentation:
 	$ make segmented-chromatin
 	
 
-Will process all files...
-####Centroids
+**Input:** 	`results/.../*_mask.tif` & `data/.../*_SIR_THR_ALN.tif` or `*_SIR_EAL_THR.tif`
+**script:** `chromseg.R`
+To make a `.tif`segmented chromatin landscape, binned into arbitrary classes inside the nuclear mask made from `make mask`
+**Output:**	`*_SEG.tif`
+
+####Centroids:
 	$ make centroids
 	
 
-Will process all files...
-####Density ditributions
+**Input:** 	`results/.../*_mask.tif` & `data/.../*_SIR_THR_ALN.tif` or `*_SIR_EAL_THR.tif`
+**script:** `foci_centroids.m`
+To make a `.csv` file of `xyz` coordinates of the intensity weighted centroids from IF signals against epigenetic markers.
+**Output:**	`*_centroids.csv`
+
+####Density ditributions:
 	$ make distributions
 	
 
-Will process all files...
-####Chromatin-IC boundaries
-	$ make 
+**Input:** `results/.../*_centroids.csv` & `results/.../*_SEG.tif` & `data/.../*_MCNR-mask.tif`
+**script:** `distribution.R`
+To take the centroid coordinates from `make centroids`and index them on the segmented landscape from `make segmented-chromatin`, generating a `.csv` distribution of the number of centroids that fall in each density class.
+**Output:**	`*_distn.csv`
+
+####Chromatin-IC boundaries:
+	$ make boundaries
 	
 
-Will process all files...
-####Distances to 
-	$ make 
-	
+**Input:** `results/.../*_SEG.tif`
+**script:** `bound.m`
+To take the the segmented landscape from `make segmented-chromatin` and generate a `.tif`binary of the boundary between class 1 and all other classes.
+**Output:**	`*_bound.tif`
 
-Will process all files...
-####Density ditributions
+####Distances to boundaries:
 	$ make d2b
 	
 
-Will process all files...
-make d2bfit
-make d2bnorm
+**Input:** `results/.../*_centroids.csv` & `results/.../*_bound.tif`& `results/.../*_masktif`
+**script:** `d2bound.m`
+To take the centroid coordinates from `make centroids`and run a nearest neighbour eucledian algorithm to voxels in the segmented boundaires from `make boundaries`, generating a `.csv` distribution of the number of centroids that fall in each density class (*md2b*).
+This is also repeated for a random sample of centroids (same number as those for the biological marker) to get a baseline for the random distribution (*rd2b*)
+**Output:**	`*_md2b.csv` & `*_rd2b.csv`
 
-### Tweaking Makefile when required
+####Distance fit to model
+	$ make d2bfit
+	
+
+**Input:** `results/.../*_md2b.csv` & `results/.../*_rd2b.csv`
+**script:** `nucleus_mask.m`
+To use a least squares regression to fit a *mu* and *sigma* for the available distances of the marker and the random sample from `make d2b`.
+**Output:**	`*_d2bfit.csv`
+
+####Distances normalized
+	$ make d2bnorm
+	
+
+**Input:** `results/.../*_d2bfit.csv`
+**script:** `nucleus_mask.m`
+To make normalised distances `make d2b`as log2fold enrichment simulated over +/- 400nm from the *mu* and *sigma* from `make d2bfit`.
+**Output:**	`*_d2bnorm.csv`
+
+### Tweaking Makefile (when/if required)
 >If you can help it, don't do it.
 
 Currently need to copy all of G1 data from all the trip directories in bioc1090/data which also end in the "*SIR_THR_ALN.tif" and "*MCNR-mask.tif":
@@ -174,20 +216,20 @@ Then need to scp to a machine that can run Fiji to open all and save them as tif
 
 Then scp to copy them back to data in Cha*i*n.
 
-### Final data management
+## Final data management
 After processing with Cha*i*N the `/results` directory (with any created sub directories) will be filled with the output files from the image analysis.
 
 Then to aggregate the distribution and network data employ these scipts from the directory where the makefile is, in this order:
 
-* Summary.R
-	* spot-class-count.R
-		* dist_compile.R
-			* SA2vol.R
+* Summary.R (**input:** `*_distn.csv`, **output:** `*_distn-summary.csv`& `*_distn-full.csv`)
+	* spot-class-count.R (**input:** `*_distn.csv`, **output:** `*_spot-class-count.csv`& `*_spot-class-summaryl.csv`)
+		* dist_compile.R (**input:**  `*_distn-summary.csv`& `*_spot-class-summary.csv`, **output:** `*_distn-compile.csv`)
+			* SA2vol.R (**input:** `*_spot-class-summary.csv` & `*_bound.tif`, **output:** `*_SA2vol_raw.csv` & `*_SA2vol_stat.csv` & `*_chrom2vol_stat.csv`)
 
 To aggregate d2b data:
 
-* summaryd2b.R
-	* d2b_compile.R
+* summaryd2b.R (**input:** `.csv`, **output:** `.csv`)
+	* d2b_compile.R (**input:** `*_network-summary.csv` & `*_abs-md2b_summary.csv` & `*_d2bnorm-summary.csv` **output:** `*_md2b-compile.csv` & `*_d2bnorm-compile.csv` & `*_network-compile.csv`)
 
 For changes in cell type and condition each script needs to be manually adjusted by changing those variables at the beginning of the script.
 
