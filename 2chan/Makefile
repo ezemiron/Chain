@@ -78,7 +78,7 @@ THR_ONLY_FILES := $(filter-out $(EDU_ONLY_FILES), $(THR_FILES))
 UNDERSCORE = _
 
 
-mask: $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-mask.tif, $(EDU_ONLY_FILES))
+mask: $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-mask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)maskA.tif, $(THR_ONLY_FILES))
 submask: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-submask.tif, $(EDU_ONLY_FILES))
 centroids: $(patsubst data/%.tif, results/%$(UNDERSCORE)centroids.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-centroids.csv, $(EDU_ONLY_FILES))
 segmented_chromatin: $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-SEG.tif, $(EDU_ONLY_FILES))
@@ -153,6 +153,19 @@ results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)EdU-distn.
 
 #results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)EdU-rd2b.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)EdU-md2b.csv
 #fake recipe, does nothing because EdU-rd2b is already made as the final argument and target of EdU-md2b
+
+#For separating A and B compartments (lamina)
+results/%$(UNDERSCORE)maskA.tif: data/%.tif | $$(dir $$@).dirstamp
+	$(OCTAVE) scripts/nucleus_maskA.m 2 $^ $@
+
+results/%$(UNDERSCORE)maskB.tif: data/%.tif | $$(dir $$@).dirstamp
+	$(OCTAVE) scripts/nucleus_maskB.m 2 $^ $@
+
+results/%$(UNDERSCORE)SEGA.tif: results/%$(UNDERSCORE)mask.tif data/%.tif results/%$(UNDERSCORE)maskA.tif 
+	$(RSCRIPT) scripts/chromseg.R 2 $^ $@
+
+results/%$(UNDERSCORE)SEGB.tif: results/%$(UNDERSCORE)mask.tif data/%.tif results/%$(UNDERSCORE)maskB.tif 
+	$(RSCRIPT) scripts/chromseg.R 2 $^ $@
 
 
 ## Generate required parent directories in results/
