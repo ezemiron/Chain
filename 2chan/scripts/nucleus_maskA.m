@@ -19,34 +19,60 @@ pkg load image;
 
 function dapi_mask_clean = get_dapi_mask (dapi)
   se_2d = strel ("disk", 10, 0);
+  se_2d2 = strel ("disk", 1, 0);
   se_3d = strel ("arbitrary", repmat (getnhood (se_2d), [1 1 3]));
+  se_3d2 = strel ("arbitrary", repmat (getnhood (se_2d2), [1 1 3]));
 
   dapi_mask = im2bw (imdilate (dapi, se_3d), graythresh (dapi(:)));
   dapi_mask = bwfill (dapi_mask, "holes", 8);
   dapi_mask = reshape (dapi_mask, size (dapi));
   dapi_mask = imerode (dapi_mask, se_2d);
   dapi_mask = imclose (dapi_mask, se_2d);
-
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imerode (dapi_mask, se_3d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-dapi_mask = imdilate (dapi_mask, se_2d);
-
-
   dapi_mask_clean = bwareaopen (dapi_mask, 10000, ones (3, 3));
+
+#gets lamina segmented
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imerode (dapi_mask, se_3d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+dapi_mask = imdilate (dapi_mask, se_2d);
+
+#segments chromocenters:
+mx = max(unique (dapi));
+mxthof8 = mx*0.4;
+mxof16b = im2double (mxthof8);
+dapi_mask3 = im2bw (dapi(:), mxof16b);
+
+dapi_mask3 = bwfill (dapi_mask3, "holes", 8);
+dapi_mask3 = reshape (dapi_mask3, size (dapi));
+dapi_mask3 = imdilate (dapi_mask3, se_3d2);
+dapi_mask3 = imdilate (dapi_mask3, se_3d2);
+dapi_mask3 = imerode (dapi_mask3, se_2d2);
+dapi_mask3 = imerode (dapi_mask3, se_2d2);
+dapi_mask3 = imerode (dapi_mask3, se_2d2);
+dapi_mask3 = imerode (dapi_mask3, se_2d2);
+dapi_mask3 = imerode (dapi_mask3, se_2d2);
+dapi_mask3 = imerode (dapi_mask3, se_2d2);
+dapi_mask3 = imdilate (dapi_mask3, se_3d2);
+dapi_mask3 = imdilate (dapi_mask3, se_3d2);
+
+
+##puts them together:
+dapi_mask = dapi_mask - dapi_mask3;
+dapi_mask_clean = dapi_mask;
+
 endfunction
 
 function [rv] = main (argv)
@@ -55,10 +81,6 @@ function [rv] = main (argv)
     error ("usage: nucleus_mask DAPI_CHANNEL IN_FPATH MASK_FPATH");
   endif
 
-  ## TODO: Could use bioformats to default to the channel closest to DAPI?
-  ##          Only if we use the dv files. The tif files saved by ImageJ
-  ##          that we got Yolanda had lost that information (instead they
-  ##          simply attached a blue LUT to the channel).
   dapi_channel = str2double (argv{1});
   in_fpath = argv{2};
   mask_fpath = argv{3};

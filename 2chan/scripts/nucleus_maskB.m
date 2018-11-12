@@ -83,15 +83,7 @@ function [rv] = main (argv)
   if (numel (argv) != 3)
     error ("usage: nucleus_mask DAPI_CHANNEL IN_FPATH MASK_FPATH");
   endif
-
-  ## TODO: Could use bioformats to default to the channel closest to DAPI?
-  ##          Only if we use the dv files. The tif files saved by ImageJ
-  ##          that we got Yolanda had lost that information (instead they
-  ##          simply attached a blue LUT to the channel).
- # dapi_channel = str2double (2);
- # in_fpath = "~/Documents/EMpaper/Gallery/EM16-09-A_C127_S2_1514_RNAP-S2P-594_Sytox_G1_03_SIR_EAL_THR.tif";
- # mask_fpath = "~/Documents/EMpaper/Gallery/EM16-09-A_C127_S2_14_RNAP-S2P-594_Sytox_G1_03_SIR_EAL_THR_maskB.tif";
-  
+ 
     dapi_channel = str2double (argv{1});
   in_fpath = argv{2};
   mask_fpath = argv{3};
