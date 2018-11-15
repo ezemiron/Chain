@@ -45,6 +45,19 @@ First you should check you have all the necessary...
 	    > library('bioimagetools')
 	    Bioimagetools 1.1.3
 
+>**Troubleshooting:**
+If R complains when installing bioimagetools it may lack system-wide libraries. These would have to be installed from terminal, probably with admin rights. eg:
+libssl-dev: `sudo apt-get install libssl-dev`
+libcurl4: `sudo apt-get install libcurl4`
+libcurl4-openssl-dev: `sudo apt-get install libcurl4-openssl-dev`
+libtiff5-dev: `sudo apt-get install libtiff5-dev`
+EBImage:
+`if (!requireNamespace("BiocManager", quietly = TRUE))`
+    `install.packages("BiocManager")`
+`BiocManager::install("EBImage", version = "3.8")`
+Or for older versions:
+`source("https://bioconductor.org/biocLite.R")`
+`biocLite("EBImage")`
 ####Octave:	at least Octave 4.0.3
 	Octave packages:
 	Octave-image 2.6.1
@@ -59,6 +72,9 @@ Need to also make a text file in your home: `~/javaclasspath.txt`
 with this inside: `/usr/local/share/java/bioformats_package.jar`
 To guide bioformats to the location of the bioformats_package.jar located on the machine.
 If you are doing this on your own machine the PATH you write inside the javaclasspath file will change.
+
+see: https://docs.openmicroscopy.org/bio-formats/5.8.1/users/octave/index.html
+
 
 ####GraphicsMagick-1.3.23
 A library for working with images.

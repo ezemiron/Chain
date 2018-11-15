@@ -106,6 +106,59 @@
     &gt; library('bioimagetools')
     Bioimagetools 1.1.3
 </code></pre>
+  <blockquote>
+   <p>
+    <strong>
+     Troubleshooting:
+    </strong>
+    <br/>
+    If R complains when installing bioimagetools it may lack system-wide libraries. These would have to be installed from terminal, probably with admin rights. eg:
+    <br/>
+    libssl-dev:
+    <code>
+     sudo apt-get install libssl-dev
+    </code>
+    <br/>
+    libcurl4:
+    <code>
+     sudo apt-get install libcurl4
+    </code>
+    <br/>
+    libcurl4-openssl-dev:
+    <code>
+     sudo apt-get install libcurl4-openssl-dev
+    </code>
+    <br/>
+    libtiff5-dev:
+    <code>
+     sudo apt-get install libtiff5-dev
+    </code>
+    <br/>
+    EBImage:
+    <br/>
+    <code>
+     if (!requireNamespace("BiocManager", quietly = TRUE))
+    </code>
+    <br/>
+    <code>
+     install.packages("BiocManager")
+    </code>
+    <br/>
+    <code>
+     BiocManager::install("EBImage", version = "3.8")
+    </code>
+    <br/>
+    Or for older versions:
+    <br/>
+    <code>
+     source("https://bioconductor.org/biocLite.R")
+    </code>
+    <br/>
+    <code>
+     biocLite("EBImage")
+    </code>
+   </p>
+  </blockquote>
   <h4 id="octave-at-least-octave-403">
    Octave: at least Octave 4.0.3
   </h4>
@@ -136,6 +189,12 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
    To guide bioformats to the location of the bioformats_package.jar located on the machine.
    <br/>
    If you are doing this on your own machine the PATH you write inside the javaclasspath file will change.
+  </p>
+  <p>
+   see:
+   <a href="https://docs.openmicroscopy.org/bio-formats/5.8.1/users/octave/index.html">
+    https://docs.openmicroscopy.org/bio-formats/5.8.1/users/octave/index.html
+   </a>
   </p>
   <h4 id="graphicsmagick-1323">
    GraphicsMagick-1.3.23

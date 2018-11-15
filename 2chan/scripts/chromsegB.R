@@ -29,7 +29,7 @@ library (bioimagetools, warn.conflicts = FALSE, verbose = FALSE)
   dapi_channel_n <- as.numeric (argv[1])
   mask_fpath <- argv[2]
   img_fpath <- argv[3]
-  maska_fpath <- argv[4]
+  maskb_fpath <- argv[4]
   out_fpath <- argv[5]
 
   if (length (argv) < 4)
@@ -58,11 +58,11 @@ library (bioimagetools, warn.conflicts = FALSE, verbose = FALSE)
   segscale = seg$class / length (seg$mu)
 
 
-  ##Masking to output the A compartment only:
-  maska <- readTIF (maska_fpath) # opens the mask
-  maska <- maska*255
-  maska = maska==1
-  segscale = segscale*maska
+  ##Masking to output the B compartment only:
+  maskb <- readTIF (maskb_fpath) # opens the mask
+  maskb <- maskb*255
+  maskb = maskb==1
+  segscale = segscale*maskb
 
   ## save as an 8 bit tif
   writeTIF (segscale, out_fpath)

@@ -78,13 +78,13 @@ THR_ONLY_FILES := $(filter-out $(EDU_ONLY_FILES), $(THR_FILES))
 UNDERSCORE = _
 
 
-mask: $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-mask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)maskA.tif, $(THR_ONLY_FILES))
+mask: $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-mask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)maskA.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)maskB.tif, $(THR_ONLY_FILES))
 submask: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-submask.tif, $(EDU_ONLY_FILES))
 centroids: $(patsubst data/%.tif, results/%$(UNDERSCORE)centroids.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-centroids.csv, $(EDU_ONLY_FILES))
-segmented_chromatin: $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-SEG.tif, $(EDU_ONLY_FILES))
+segmented_chromatin: $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-SEG.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)SEGA.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)SEGB.tif, $(THR_ONLY_FILES))
 boundaries: $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(THR_ONLY_FILES)) 
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-bound.tif, $(EDU_ONLY_FILES))
-distribution: $(patsubst data/%.tif, results/%$(UNDERSCORE)distn.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-distn.csv, $(EDU_ONLY_FILES))
+distribution: $(patsubst data/%.tif, results/%$(UNDERSCORE)distn.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)distnA.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)distnB.csv, $(THR_ONLY_FILES)) 
 d2b: $(patsubst data/%.tif, results/%$(UNDERSCORE)md2b.csv, $(THR_ONLY_FILES)) 
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)rd2b.csv, $(THR_ONLY_FILES)) 
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-md2b.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-rd2b.csv, $(EDU_ONLY_FILES))
@@ -167,6 +167,11 @@ results/%$(UNDERSCORE)SEGA.tif: results/%$(UNDERSCORE)mask.tif data/%.tif result
 results/%$(UNDERSCORE)SEGB.tif: results/%$(UNDERSCORE)mask.tif data/%.tif results/%$(UNDERSCORE)maskB.tif 
 	$(RSCRIPT) scripts/chromseg.R 2 $^ $@
 
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distnA.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGA.tif data/%$(UNDERSCORE)EAL$(UNDERSCORE)MCNR-mask.tif
+	$(RSCRIPT) scripts/distribution.R $^ > $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distnB.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGB.tif data/%$(UNDERSCORE)EAL$(UNDERSCORE)MCNR-mask.tif
+	$(RSCRIPT) scripts/distribution.R $^ > $@
 
 ## Generate required parent directories in results/
 ##
