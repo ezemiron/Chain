@@ -162,10 +162,10 @@ results/%$(UNDERSCORE)maskB.tif: data/%.tif | $$(dir $$@).dirstamp
 	$(OCTAVE) scripts/nucleus_maskB.m 2 $^ $@
 
 results/%$(UNDERSCORE)SEGA.tif: results/%$(UNDERSCORE)mask.tif data/%.tif results/%$(UNDERSCORE)maskA.tif 
-	$(RSCRIPT) scripts/chromseg.R 2 $^ $@
+	$(RSCRIPT) scripts/chromsegA.R 2 $^ $@
 
 results/%$(UNDERSCORE)SEGB.tif: results/%$(UNDERSCORE)mask.tif data/%.tif results/%$(UNDERSCORE)maskB.tif 
-	$(RSCRIPT) scripts/chromseg.R 2 $^ $@
+	$(RSCRIPT) scripts/chromsegB.R 2 $^ $@
 
 results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distnA.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGA.tif data/%$(UNDERSCORE)EAL$(UNDERSCORE)MCNR-mask.tif
 	$(RSCRIPT) scripts/distribution.R $^ > $@
