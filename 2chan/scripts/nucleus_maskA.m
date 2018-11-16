@@ -20,8 +20,10 @@ pkg load image;
 function dapi_mask_clean = get_dapi_mask (dapi)
   se_2d = strel ("disk", 10, 0);
   se_2d2 = strel ("disk", 1, 0);
+  se_2d3 = strel ("disk", 3, 0);
   se_3d = strel ("arbitrary", repmat (getnhood (se_2d), [1 1 3]));
   se_3d2 = strel ("arbitrary", repmat (getnhood (se_2d2), [1 1 3]));
+  se_3d3 = strel ("arbitrary", repmat (getnhood (se_2d3), [1 1 3]));
 
   dapi_mask = im2bw (imdilate (dapi, se_3d), graythresh (dapi(:)));
   dapi_mask = bwfill (dapi_mask, "holes", 8);
@@ -67,7 +69,8 @@ dapi_mask3 = imerode (dapi_mask3, se_2d2);
 dapi_mask3 = imerode (dapi_mask3, se_2d2);
 dapi_mask3 = imdilate (dapi_mask3, se_3d2);
 dapi_mask3 = imdilate (dapi_mask3, se_3d2);
-
+dapi_mask3 = imdilate (dapi_mask3, se_3d2);
+dapi_mask3 = imdilate (dapi_mask3, se_3d3);
 
 ##puts them together:
 dapi_mask = dapi_mask - dapi_mask3;
