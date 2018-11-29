@@ -1202,6 +1202,61 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
     To work out the network radius from a tubular model and plot the radius as point with 95CI bars or the network diameter
    </li>
   </ul>
+  <h3 id="useful-tools">
+   Useful tools:
+  </h3>
+  <p>
+   General Bash commands for manipulating data in batch:
+  </p>
+  <p>
+   Use this to
+   <strong>
+    MOVE
+   </strong>
+   all files not tifs or dvs from directory “.” to another directory:
+   <br/>
+   <code>
+    find . -type f ! -name "*.tif" ! -name "*.dv" -exec mv {} ~/Documents/Microscopy/2015/2015.08/EM15-08-B/ \;
+   </code>
+  </p>
+  <p>
+   Use this to
+   <strong>
+    COPY
+   </strong>
+   all files in this directory and below which have “
+   <em>
+    histone mod
+   </em>
+   ” and end in X or Y to somewhere else
+   <br/>
+   <code>
+    find . -type f \( -name "*H3K4me3*" -and \( -name "*EAL_THR.tif" -or -name "*MCNR-mask.tif" \) \) -exec cp {} /Volumes/wolf4192/papers/chrom_marks... \;
+   </code>
+  </p>
+  <p>
+   <code>
+    find . -type f \( -name "*EAL_THR.tif" -or -name "*_THR_mask.tif" \) -exec cp {} /Volumes/wolf4192/data/OLDSYS \;
+   </code>
+   <br/>
+   <code>
+    find . -type f -name "*MCNR-mask.tif" -name "*SIR_EAL_THR.tif" -exec cp {} ~/data/ \;
+   </code>
+  </p>
+  <p>
+   finds all files that finish with centroids.csv and are also empty and removes them:
+   <br/>
+   <code>
+    find . -size 0b -a -type f -name "*centroids.csv" -exec rm -f {} \;
+   </code>
+  </p>
+  <p>
+   counts the number of files of a particular type
+   <br/>
+   <code>
+    find results/ -type f -name *d2b* | wc -l
+   </code>
+  </p>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js">
   </script>
   <script>

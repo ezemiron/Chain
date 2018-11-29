@@ -198,7 +198,7 @@ results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distnB.csv
 RESULT_DIRS := $(patsubst data/%, results/%, $(shell find data/* -type d -print))
 DIRSTAMPS := $(addsuffix /.dirstamp, $(RESULT_DIRS))
 
-##Uncomment both of the "@mkdir..." lines below (for results/.dirstamp and for .SECONDEXPANSION) if a new directory was added to data/
+##comment out both of the "@mkdir..." lines below (for results/.dirstamp and for .SECONDEXPANSION) if a new directory was added to results/    
 results/.dirstamp:
 	@mkdir -p $(dir $@)
 	@touch $@

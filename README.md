@@ -308,7 +308,23 @@ Required packages:
 * To plot changes in each chromatin network size as continuous line (G1_network-compile.csv)
 * To work out the network radius from a tubular model and plot the radius as point with 95CI bars or the network diameter
 
+###Useful tools:
+General Bash commands for manipulating data in batch:
 
+Use this to **MOVE** all files not tifs or dvs from directory "." to another directory:
+`find . -type f ! -name "*.tif" ! -name "*.dv" -exec mv {} ~/Documents/Microscopy/2015/2015.08/EM15-08-B/ \;`
+
+Use this to **COPY** all files in this directory and below which have “*histone mod*” and end in X or Y to somewhere else
+`find . -type f \( -name "*H3K4me3*" -and \( -name "*EAL_THR.tif" -or -name "*MCNR-mask.tif" \) \) -exec cp {} /Volumes/wolf4192/papers/chrom_marks... \;`
+
+`find . -type f \( -name "*EAL_THR.tif" -or -name "*_THR_mask.tif" \) -exec cp {} /Volumes/wolf4192/data/OLDSYS \;`
+`find . -type f -name "*MCNR-mask.tif" -name "*SIR_EAL_THR.tif" -exec cp {} ~/data/ \;`
+
+finds all files that finish with centroids.csv and are also empty and removes them:
+`find . -size 0b -a -type f -name "*centroids.csv" -exec rm -f {} \;`
+
+counts the number of files of a particular type
+`find results/ -type f -name *d2b* | wc -l`
 
 
 
