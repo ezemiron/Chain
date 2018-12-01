@@ -26,7 +26,8 @@ help:
 	@echo
 	@echo "   centroids           - CSV files with centroid coordinates"
 	@echo "   mask                - Binary masks for nucleus (DAPI or Sytox)"
-	@echo "   submask             - Binary masks for replication foci"
+	@echo "   submask             - Binary masks for replication/repair foci"
+	@echo "   difmask             - Binary masks for not replication/repair foci"
 	@echo "   segmented_chromatin - Multi-level segmentation of chromatin."
 	@echo "   distribution        - CSV file with the total number of centroids found in each class of the segmented nucleus"
 	@echo "   boundaries          - TIF of 3D boundaries of specified chromatin class, default class 1"
@@ -78,6 +79,7 @@ HCT_ONLY_FILES := $(shell find data/ -type f -name '*G1*THR_ALN.tif')
 ##4C_EDU_ONLY := $(shell find data/ -type f -name '*4-color-EdU_*THR_ALN.tif')
 ##THR_EDU_FILES := $(filter-out $(HCT_ONLY_FILES), $(THR_CHROMATIN_FIRST_FILES), $(THR_FILES))
 ##THR_ONLY_FILES := $(filter-out $(HCT_ONLY_FILES), $(EDU_ONLY_FILES), $(THR_FILES))
+FO_ONLY_FILES := $(shell find data/ -type f -name 'FO*THR_ALN.tif')
 
 
 ## Makefile oddities... We do this so we can use them int pattern rules
@@ -85,29 +87,41 @@ HCT_ONLY_FILES := $(shell find data/ -type f -name '*G1*THR_ALN.tif')
 UNDERSCORE = _
 
 
-mask: $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-mask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)4color-mask.tif, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)NNA-mask.tif, $(NNA_ONLY_FILES))
+mask: $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-mask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)4color-mask.tif, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)NNA-mask.tif, $(NNA_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-mask.tif, $(FO_ONLY_FILES))
 ## $(patsubst data/%.tif, results/%$(UNDERSCORE)FISH-mask.tif, $(RFISH_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(HCT_ONLY_FILES))
-submask: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-submask.tif, $(EDU_ONLY_FILES))
-difmask: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-difmask.tif, $(EDU_ONLY_FILES)) 
+
+submask: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-submask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-submask.tif, $(FO_ONLY_FILES))
+
+difmask: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-difmask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-difmask.tif, $(FO_ONLY_FILES))
 ## $(patsubst data/%.tif, results/%$(UNDERSCORE)FISH-submask.tif, $(RFISH_ONLY_FILES))
-centroids: $(patsubst data/%.tif, results/%$(UNDERSCORE)centroids.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)Rep-centroids.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-centroids.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-centroids.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C1-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C2-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C3-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C4-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C1-centroids.csv, $(NNA_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C2-centroids.csv, $(NNA_ONLY_FILES))
+
+centroids: $(patsubst data/%.tif, results/%$(UNDERSCORE)centroids.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)Rep-centroids.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-centroids.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-centroids.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C1-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C2-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C3-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C4-centroids.csv, $(4C_EDU_ONLY)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C1-centroids.csv, $(NNA_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C2-centroids.csv, $(NNA_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-centroids.csv, $(FO_ONLY_FILES))
 ## $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-centroids.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-centroids.csv, $(EDU_ONLY_FILES)) 
 ## $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-centroids.csv, $(EDU_ONLY_FILES))
 ## $(patsubst data/%.tif, results/%$(UNDERSCORE)C1-centroids.csv, $(NNA_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C2-centroids.csv, $(NNA_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)FISH-centroids.csv, $(RFISH_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-centroids.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-centroids.csv, $(HCT_ONLY_FILES))
+
 centroid_volume: $(patsubst data/%.tif, results/%$(UNDERSCORE)centroidsvol.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-centroidsMCN.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-centroidsMCN.csv, $(HCT_ONLY_FILES))
+
 centroid_MCN: $(patsubst data/%.tif, results/%$(UNDERSCORE)dif-centroidsMCN.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-centroidsMCN.csv, $(EDU_ONLY_FILES))
 ## $(patsubst data/%.tif, results/%$(UNDERSCORE)FISH-centroidsvol.csv, $(RFISH_ONLY_FILE)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-centroidsvol.csv, $(EDU_ONLY_FILES))
-segmented_chromatin: $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-SEG.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)FISH-SEG.tif, $(RFISH_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(HCT_ONLY_FILES))
+
+segmented_chromatin: $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-SEG.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)FISH-SEG.tif, $(RFISH_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(HCT_ONLY_FILES))$(patsubst data/%.tif, results/%$(UNDERSCORE)repa-SEG.tif, $(FO_ONLY_FILES))
+
 boundaries: $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-bound.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(HCT_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-bound.tif, $(EDU_ONLY_FILES))
-distribution: $(patsubst data/%.tif, results/%$(UNDERSCORE)Rep-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)dif-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-distn.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-distn.csv, $(HCT_ONLY_FILES))
+
+distribution: $(patsubst data/%.tif, results/%$(UNDERSCORE)Rep-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)dif-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-distn.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-distn.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-distn.csv, $(FO_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-subdistn.csv, $(FO_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-difdistn.csv, $(FO_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)distn.csv, $(THR_ONLY_FILES))
+
 d2b: $(patsubst data/%.tif, results/%$(UNDERSCORE)MCN_md2b.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-md2b.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-md2b.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-md2b.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)dif-md2b.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)dif-md2b.csv, $(EDU_ONLY_FILES)) 
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-md2b.csv, $(EDU_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)rd2b.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-rd2b.csv, $(EDU_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-md2b.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-rd2b.csv, $(EDU_ONLY_FILES))
+
 d2bfit: $(patsubst data/%.tif, results/%$(UNDERSCORE)MCN_d2bfit.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-d2bfit.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-d2bfit.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-d2bfit.csv, $(HCT_ONLY_FILES))
+
 d2bnorm: $(patsubst data/%.tif, results/%$(UNDERSCORE)MCN_d2bnorm.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-d2bnorm.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-d2bnorm.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-d2bnorm.csv, $(HCT_ONLY_FILES))
+
 NNA: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdUtoMark_NNA.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-NNA.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C1-C2_NNA.csv, $(NNA_ONLY_FILES)) 
 
 ## FIXME It seems that the dapi/sytox channel is not always the same.  And
@@ -148,6 +162,8 @@ NNA: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdUtoMark_NNA.csv, $(EDU_ONLY_
 ##results/%$(UNDERSCORE)SIR$(UNDERSCORE)ALN$(UNDERSCORE)THR$(UNDERSCORE)MCN_d2bnorm.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)ALN$(UNDERSCORE)THR$(UNDERSCORE)MCN_d2bfit.csv
 ##	$(RSCRIPT) scripts/d2bnorm.R $^ > $@
 
+
+
 ## EdU-color
 ##results/%$(UNDERSCORE)4color-mask.tif: data/%.tif | $$(dir $$@).dirstamp
 ##	$(OCTAVE) scripts/nucleus_mask_NNA.m 1 $^ $@
@@ -163,6 +179,8 @@ NNA: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdUtoMark_NNA.csv, $(EDU_ONLY_
 
 ##results/%$(UNDERSCORE)C4-centroids.csv: results/%$(UNDERSCORE)4color-mask.tif data/%.tif
 ##	$(OCTAVE) scripts/foci_centroids2.m 4 $^ 4 > $@
+
+
 
 
 #replication data recipes:
@@ -321,6 +339,43 @@ results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)C488-d2bno
 
 #results/%$(UNDERSCORE)C1-C2_NNA.csv: results/%$(UNDERSCORE)C1-centroids.csv results/%$(UNDERSCORE)C2-centroids.csv
 #	$(OCTAVE) scripts/NNA.m $^ results/$*$(UNDERSCORE)C1-C2_NNA.csv results/$*$(UNDERSCORE)C2-C1_NNA.csv
+
+
+
+
+
+
+#Repair data recipes for Fena's paper:
+results/%$(UNDERSCORE)repa-mask.tif: data/%.tif | $$(dir $$@).dirstamp
+	$(OCTAVE) scripts/edu_mask2.m 1 $^ $@
+
+results/%$(UNDERSCORE)repa-submask.tif: data/%.tif | $$(dir $$@).dirstamp
+	$(OCTAVE) scripts/edu_mask.m 2 $^ $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difmask.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-mask.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-submask.tif
+	$(OCTAVE) scripts/DAPI_EdU.m $^ $@
+
+results/%$(UNDERSCORE)repa-centroids.csv: results/%$(UNDERSCORE)mask.tif data/%.tif
+	$(OCTAVE) scripts/foci_centroids2.m 2 $^ 3 > $@ 
+
+results/%$(UNDERSCORE)repa-SEG.tif: results/%$(UNDERSCORE)repa-mask.tif data/%.tif
+	$(RSCRIPT) scripts/chromseg.R 1 $^ $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difdistn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif data/%$(UNDERSCORE)ALN$(UNDERSCORE)MCNR-mask.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difmask.tif
+	$(RSCRIPT) scripts/edu_distribution.R $^ > $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-subdistn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif data/%$(UNDERSCORE)ALN$(UNDERSCORE)MCNR-mask.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-submask.tif
+	$(RSCRIPT) scripts/edu_distribution.R $^ > $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-distn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-mask.tif
+	$(RSCRIPT) scripts/edu_distribution_Rep.R $^ > $@
+
+
+
+
+
+
+
 
 
 ## Generate required parent directories in results/

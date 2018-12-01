@@ -1,5 +1,5 @@
   pkg load image;
-  pkg load statistics;
+#  pkg load statistics;
 
 function [rv] = main (argv)
 
