@@ -6,7 +6,7 @@ setBatchMode(true);
 for (i=0; i<list.length; i++) {
     showProgress(i+1, list.length);
     filename = dir1 + list[i];
-    string=replace(list[i],"(.tif)","-1"); 
+    string=replace(list[i],"(.tif)",".tif"); 
     
     
     if (endsWith(filename, ".tif")) {
