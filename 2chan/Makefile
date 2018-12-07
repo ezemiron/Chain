@@ -79,18 +79,26 @@ UNDERSCORE = _
 
 
 mask: $(patsubst data/%.tif, results/%$(UNDERSCORE)mask.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-mask.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)maskA.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)maskB.tif, $(THR_ONLY_FILES))
+
 submask: $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-submask.tif, $(EDU_ONLY_FILES))
+
 centroids: $(patsubst data/%.tif, results/%$(UNDERSCORE)centroids.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-centroids.csv, $(EDU_ONLY_FILES))
+
 segmented_chromatin: $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-SEG.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)SEGA.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)SEGB.tif, $(THR_ONLY_FILES))
-boundaries: $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(THR_ONLY_FILES)) 
+
+boundaries: $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)boundA.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)boundB.tif, $(THR_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-bound.tif, $(EDU_ONLY_FILES))
+
 distribution: $(patsubst data/%.tif, results/%$(UNDERSCORE)distn.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)distnA.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)distnB.csv, $(THR_ONLY_FILES)) 
-d2b: $(patsubst data/%.tif, results/%$(UNDERSCORE)md2b.csv, $(THR_ONLY_FILES)) 
+
+d2b: $(patsubst data/%.tif, results/%$(UNDERSCORE)md2b.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)md2bA.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)md2bB.csv, $(THR_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)rd2b.csv, $(THR_ONLY_FILES)) 
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-md2b.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-rd2b.csv, $(EDU_ONLY_FILES))
-d2bfit: $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bfit.csv, $(THR_ONLY_FILES))
+
+d2bfit: $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bfit.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bfitA.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bfitB.csv, $(THR_ONLY_FILES)) 
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-d2bfit.csv, $(EDU_ONLY_FILES))
-d2bnorm: $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bnorm.csv, $(THR_ONLY_FILES))
+
+d2bnorm: $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bnorm.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bnormA.csv, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)d2bnormB.csv, $(THR_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-d2bnorm.csv, $(EDU_ONLY_FILES))
 
 ## FIXME It seems that the dapi/sytox channel is not always the same.  And
@@ -154,24 +162,50 @@ results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)EdU-distn.
 #results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)EdU-rd2b.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)EdU-md2b.csv
 #fake recipe, does nothing because EdU-rd2b is already made as the final argument and target of EdU-md2b
 
-#For separating A and B compartments (lamina)
+
+
+#For separating A and B compartments (lamina and chromocenters)
 results/%$(UNDERSCORE)maskA.tif: data/%.tif | $$(dir $$@).dirstamp
 	$(OCTAVE) scripts/nucleus_maskA.m 2 $^ $@
-
 results/%$(UNDERSCORE)maskB.tif: data/%.tif | $$(dir $$@).dirstamp
 	$(OCTAVE) scripts/nucleus_maskB.m 2 $^ $@
 
 results/%$(UNDERSCORE)SEGA.tif: results/%$(UNDERSCORE)mask.tif data/%.tif results/%$(UNDERSCORE)maskA.tif 
 	$(RSCRIPT) scripts/chromsegA.R 2 $^ $@
-
 results/%$(UNDERSCORE)SEGB.tif: results/%$(UNDERSCORE)mask.tif data/%.tif results/%$(UNDERSCORE)maskB.tif 
 	$(RSCRIPT) scripts/chromsegB.R 2 $^ $@
 
 results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distnA.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGA.tif data/%$(UNDERSCORE)EAL$(UNDERSCORE)MCNR-mask.tif
 	$(RSCRIPT) scripts/distribution.R $^ > $@
-
 results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distnB.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGB.tif data/%$(UNDERSCORE)EAL$(UNDERSCORE)MCNR-mask.tif
 	$(RSCRIPT) scripts/distribution.R $^ > $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)boundA.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGA.tif
+	$(OCTAVE) scripts/bound.m 1 $^ $@
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)boundB.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGB.tif
+	$(OCTAVE) scripts/bound.m 1 $^ $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bA.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGA.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)boundA.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)maskA.tif
+	$(OCTAVE) scripts/d2bound.m 1 $^ results/$*$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bA.csv results/$*$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)rd2bA.csv
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bB.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEGB.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)boundB.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)maskB.tif
+	$(OCTAVE) scripts/d2bound.m 1 $^ results/$*$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bB.csv results/$*$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)rd2bB.csv
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)rd2bA.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bA.csv
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)rd2bB.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bB.csv
+##fake recipes, do nothing because rd2b is already made as the final argument and target of md2b
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)d2bfitA.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bA.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)rd2bA.csv
+	$(RSCRIPT) scripts/d2bfit.R $^ > $@
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)d2bfitB.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)md2bB.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)rd2bB.csv
+	$(RSCRIPT) scripts/d2bfit.R $^ > $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)d2bnormA.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)d2bfitA.csv
+	$(RSCRIPT) scripts/d2bnorm.R $^ > $@
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)d2bnormB.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)d2bfitB.csv
+	$(RSCRIPT) scripts/d2bnorm.R $^ > $@
+
+
+
 
 ## Generate required parent directories in results/
 ##
