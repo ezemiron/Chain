@@ -23,8 +23,8 @@ dirchosen <- getwd()
 
 
 
-Cell = "C127"
-Condition = "Trip"
+Cell = "Fena"
+Condition = "G2"
 
 topPATH = paste(Cell, Condition, sep = "/")
 
@@ -49,7 +49,7 @@ for (dir_name in dir_names){
     allfilesandpaths <- list.files(pattern= var_name, full.names=TRUE);
     if (length(allfilesandpaths) > 0){
     
-      filesandpaths  <- grep("*distn.csv",allfilesandpaths, value = TRUE)
+      filesandpaths  <- grep("*-subdistn.csv",allfilesandpaths, value = TRUE)
       if (length(filesandpaths) > 0){
     
         for (fileandpath in filesandpaths){
@@ -66,13 +66,13 @@ for (dir_name in dir_names){
 #    df <- transform(df, AvNorm = rowMeans(df[,-1], na.rm = TRUE))
 #    df <- transform(df, Log2AvNorm = log2(df$AvNorm))
 
-        savename  <- paste0(var_name,"_spot-class-count.csv")
+        savename  <- paste0(var_name,"_spot-class-sub-count.csv")
         write.csv(df,savename);
 
         df2 <-aggregate(df[,2:3:4:5], list(class =df$class), mean)
         df2 <-transform(df2, numofcells = rep(max(df$cell),dim(df2)[1]))
       
-        savename2  <- paste0(var_name,"_spot-class-summary.csv")
+        savename2  <- paste0(var_name,"_spot-class-sub-summary.csv")
         write.csv(df2,savename2);
         }
     }

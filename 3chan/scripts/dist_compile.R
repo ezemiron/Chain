@@ -21,7 +21,7 @@ dirchosen <- readline(prompt = "This script should be run two directories above 
 
 dirchosen <- getwd()
 
-celltype = "C127"
+celltype = "Fena"
 
 topdir_names <- list.dirs(celltype, recursive = FALSE)
 #topdir_names <- topdir_names[2:length(topdir_names)]
@@ -55,17 +55,17 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
       allfilesandpaths <- list.files(pattern= var_name, full.names=TRUE);
       
       if (length(allfilesandpaths) > 0){
-        distnsum  <- grep("*_distn-summary.csv",allfilesandpaths, value = TRUE)
+        distnsum  <- grep("*_subdistn-chrom-summary.csv",allfilesandpaths, value = TRUE)
 
         if (length(distnsum) > 0){
-          spotsum <- sub ("distn-summary", "spot-class-summary", distnsum)
+          spotsum <- sub ("subdistn-chrom-summary", "spot-class-sub-summary", distnsum)
           
           if (length (which (allfilesandpaths == spotsum))> 0){
             condition <- rep(con_name, 7)
             condition <- as.data.frame(condition)
 
             dfB <- read.csv(distnsum)
-            dfB <- dfB[, c("Marker","class","Log2AvNorm","lowLogErr","uprLogErr")]
+            dfB <- dfB[, c("Marker","class","StDv","negCI95","posCI95")]
 
             dfC <- read.csv(spotsum)
             dfC <- dfC[, c("spotnum","spotnumn","classnum","classnumn","numofcells")]
@@ -86,8 +86,8 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
 
 #rename
         dfA <- dfA[2:nrow(dfA),]
-        names(dfA) <- c("condition","Marker", "class", "Log2AvNorm","lowLogErr","uprLogErr","spotnum","spotnumn","classnum","classnumn","numofcells")
+        names(dfA) <- c("condition","Marker", "class", "StDv","negCI95","posCI95","spotnum","spotnumn","classnum","classnumn","numofcells")
 
-        savename  <- paste0(con_name,"_distn-compile_volnorm.csv")
+        savename  <- paste0(con_name,"_distn-compile-subchrom_volnorm.csv")
         write.csv(dfA,savename);
   }
