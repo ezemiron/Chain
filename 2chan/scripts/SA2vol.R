@@ -22,7 +22,7 @@ dirchosen  <- readline(prompt = "This script should be run from the results dire
 dirchosen <- getwd()
 
 celltype = "C127"
-condition = "Trip"
+condition = "ABcomps"
 topPATH = paste(celltype, condition, sep = "/")
 
 dir_names <- list.dirs(topPATH, recursive = TRUE)
@@ -45,10 +45,10 @@ for (dir_name in dir_names){
   #var_name <- var_names[dir_num]
 
 
-  filesandpaths <- list.files(pattern= "*_bound.tif", full.names=TRUE, recursive = FALSE);
+  filesandpaths <- list.files(pattern= "*_boundB.tif", full.names=TRUE, recursive = FALSE);
   if (length(filesandpaths) > 0){
 
-    chromclass <- list.files(pattern= "*spot-class-count.csv", full.names=TRUE, recursive = FALSE);
+    chromclass <- list.files(pattern= "*spot-classB-count.csv", full.names=TRUE, recursive = FALSE);
 
     if ((length(chromclass ==1)&(file.size(chromclass)> 0))){
       chromclass <- read.csv(chromclass[1])
@@ -92,7 +92,7 @@ df <- transform(df,  SA2vol= ((df$boundsum)/(df$chromvol)))
 df <- transform(df,  chrom2vol= ((df$chromvol)/(df$nucvol)))
 
 setwd(dirchosen2)
-savename  <- paste0(celltype,"_",condition,"_SA2vol_raw.csv")
+savename  <- paste0(celltype,"_",condition,"_SA2volB_raw.csv")
 write.csv(df,savename);
 
 
@@ -108,11 +108,11 @@ Statsum <- function(x){
 dfStat <- as.data.frame(Statsum(df$SA2vol))
 names(dfStat) <- c("mean-SA2vol","sdDev","lowCI95","uprCI95")
 dfStat <- cbind(celltype, condition, dfStat)
-savename2  <- paste0(celltype,"_",condition,"_SA2vol_stat.csv")
+savename2  <- paste0(celltype,"_",condition,"_SA2volB_stat.csv")
 write.csv(dfStat,savename2);
 
 dfStat <- as.data.frame(Statsum(df$chrom2vol))
 names(dfStat) <- c("mean-chrom2vol","sdDev","lowCI95","uprCI95")
 dfStat <- cbind(celltype, condition, dfStat)
-savename2  <- paste0(celltype,"_",condition,"_chrom2vol_stat.csv")
+savename2  <- paste0(celltype,"_",condition,"_chrom2volB_stat.csv")
 write.csv(dfStat,savename2);
