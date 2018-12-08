@@ -36,8 +36,8 @@ help:
 	@echo "   d2bnorm             - CSV file with normalised distances over random from centroids to the surface of interchromatin and as log2fold enrichment."
 	@echo "   clean               - Remove paper and all intermediary files (results)."
 	@echo "   NNA                 - Euclidean nearest neighbor analysis on two centroid CSV files."
-	@echo "   centroid_volume     - Determine the volume of centroids based on the MCNR-mask
-	@echo "   difmask	      - Difference between nuclear and EdU-mask
+	@echo "   centroid_volume     - Determine the volume of centroids based on the MCNR-mask"
+	@echo "   difmask	      - Difference between nuclear and EdU-mask"
 	@echo
 	@echo "Environment variables:"
 	@echo "   OCTAVE  - octave interpreter program (default: octave)."
@@ -107,7 +107,7 @@ centroid_MCN: $(patsubst data/%.tif, results/%$(UNDERSCORE)dif-centroidsMCN.csv,
 
 segmented_chromatin: $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-SEG.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)FISH-SEG.tif, $(RFISH_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)SEG.tif, $(HCT_ONLY_FILES))$(patsubst data/%.tif, results/%$(UNDERSCORE)repa-SEG.tif, $(FO_ONLY_FILES))
 
-boundaries: $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-bound.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(HCT_ONLY_FILES))
+boundaries: $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(THR_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)mask-bound.tif, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)bound.tif, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-bound.tif, $(FO_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-subbound.tif, $(FO_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-difbound.tif, $(FO_ONLY_FILES))
 #$(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-bound.tif, $(EDU_ONLY_FILES))
 
 distribution: $(patsubst data/%.tif, results/%$(UNDERSCORE)Rep-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)EdU-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)dif-distn.csv, $(EDU_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C594-distn.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)C488-distn.csv, $(HCT_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-distn.csv, $(FO_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-subdistn.csv, $(FO_ONLY_FILES)) $(patsubst data/%.tif, results/%$(UNDERSCORE)repa-difdistn.csv, $(FO_ONLY_FILES))
@@ -348,10 +348,8 @@ results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)C488-d2bno
 #Repair data recipes for Fena's paper:
 results/%$(UNDERSCORE)repa-mask.tif: data/%.tif | $$(dir $$@).dirstamp
 	$(OCTAVE) scripts/edu_mask2.m 1 $^ $@
-
 results/%$(UNDERSCORE)repa-submask.tif: data/%.tif | $$(dir $$@).dirstamp
 	$(OCTAVE) scripts/edu_mask.m 2 $^ $@
-
 results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difmask.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-mask.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-submask.tif
 	$(OCTAVE) scripts/DAPI_EdU.m $^ $@
 
@@ -361,18 +359,19 @@ results/%$(UNDERSCORE)repa-centroids.csv: results/%$(UNDERSCORE)mask.tif data/%.
 results/%$(UNDERSCORE)repa-SEG.tif: results/%$(UNDERSCORE)repa-mask.tif data/%.tif
 	$(RSCRIPT) scripts/chromseg.R 1 $^ $@
 
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-distn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-mask.tif
+	$(RSCRIPT) scripts/edu_distribution_Rep.R $^ > $@
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-subdistn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif data/%$(UNDERSCORE)ALN$(UNDERSCORE)MCNR-mask.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-submask.tif
+	$(RSCRIPT) scripts/edu_distribution.R $^ > $@
 results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difdistn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif data/%$(UNDERSCORE)ALN$(UNDERSCORE)MCNR-mask.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difmask.tif
 	$(RSCRIPT) scripts/edu_distribution.R $^ > $@
 
-results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-subdistn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif data/%$(UNDERSCORE)ALN$(UNDERSCORE)MCNR-mask.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-submask.tif
-	$(RSCRIPT) scripts/edu_distribution.R $^ > $@
-
-results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-distn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-mask.tif
-	$(RSCRIPT) scripts/edu_distribution_Rep.R $^ > $@
-
-
-
-
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-bound.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-mask.tif
+	$(OCTAVE) scripts/boundsub.m 1 $^ $@
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-subbound.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-submask.tif
+	$(OCTAVE) scripts/boundsub.m 1 $^ $@
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difbound.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-SEG.tif results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)repa-difmask.tif
+	$(OCTAVE) scripts/boundsub.m 1 $^ $@
 
 
 
