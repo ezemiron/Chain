@@ -45,6 +45,19 @@ First you should check you have all the necessary...
 	    > library('bioimagetools')
 	    Bioimagetools 1.1.3
 
+>**Troubleshooting:**
+If R complains when installing bioimagetools it may lack system-wide libraries. These would have to be installed from terminal, probably with admin rights. eg:
+libssl-dev: `sudo apt-get install libssl-dev`
+libcurl4: `sudo apt-get install libcurl4`
+libcurl4-openssl-dev: `sudo apt-get install libcurl4-openssl-dev`
+libtiff5-dev: `sudo apt-get install libtiff5-dev`
+EBImage:
+`if (!requireNamespace("BiocManager", quietly = TRUE))`
+    `install.packages("BiocManager")`
+`BiocManager::install("EBImage", version = "3.8")`
+Or for older versions:
+`source("https://bioconductor.org/biocLite.R")`
+`biocLite("EBImage")`
 ####Octave:	at least Octave 4.0.3
 	Octave packages:
 	Octave-image 2.6.1
@@ -59,6 +72,9 @@ Need to also make a text file in your home: `~/javaclasspath.txt`
 with this inside: `/usr/local/share/java/bioformats_package.jar`
 To guide bioformats to the location of the bioformats_package.jar located on the machine.
 If you are doing this on your own machine the PATH you write inside the javaclasspath file will change.
+
+see: https://docs.openmicroscopy.org/bio-formats/5.8.1/users/octave/index.html
+
 
 ####GraphicsMagick-1.3.23
 A library for working with images.
@@ -187,12 +203,22 @@ To take the centroid coordinates from `make centroids`and run a nearest neighbou
 This is also repeated for a random sample of centroids (same number as those for the biological marker) to get a baseline for the random distribution (*rd2b*)
 **Output:**	`*_md2b.csv` & `*_rd2b.csv`
 
+>**Troubleshooting:**
+The Make workflow will work automatically until this point.
+That is to say that typing `make d2b` will result in all files being made which are required to make the d2b files. This includes masks, SEGs, boundaries etcs.
+The next two scripts (d2bfit and d2bnorm) are also managed by the Make system. However typing `make d2bfit` or `make d2bnorm` without having all files required will result in an error saying that there is no recipe to make the required output files of these scripts. 
+This is related to the dual outputs of the `d2b` script which are the dual inputs of `d2bfit` command.
+Thus if the output of `d2bfit` or `d2bnorm` are required, it is adviced to do this in two steps.
+1. `make d2b`
+2. `make d2bfit` or `make d2bnorm`
+
+
 ####Distance fit to model
 	$ make d2bfit
 	
 
 **Input:** `results/.../*_md2b.csv` & `results/.../*_rd2b.csv`
-**script:** `nucleus_mask.m`
+**script:** `d2bfit.R`
 To use a least squares regression to fit a *mu* and *sigma* for the available distances of the marker and the random sample from `make d2b`.
 **Output:**	`*_d2bfit.csv`
 
@@ -201,7 +227,7 @@ To use a least squares regression to fit a *mu* and *sigma* for the available di
 	
 
 **Input:** `results/.../*_d2bfit.csv`
-**script:** `nucleus_mask.m`
+**script:** `d2bnorm.R`
 To make normalised distances `make d2b`as log2fold enrichment simulated over +/- 400nm from the *mu* and *sigma* from `make d2bfit`.
 **Output:**	`*_d2bnorm.csv`
 
@@ -216,7 +242,7 @@ Then need to scp to a machine that can run Fiji to open all and save them as tif
 
 Then scp to copy them back to data in Cha*i*n.
 
-## Final data management
+## Final data management and aggregation
 After processing with Cha*i*N the `/results` directory (with any created sub directories) will be filled with the output files from the image analysis.
 
 Then to aggregate the distribution and network data employ these scipts from the directory where the makefile is, in this order:
@@ -233,8 +259,8 @@ To aggregate d2b data:
 
 For changes in cell type and condition each script needs to be manually adjusted by changing those variables at the beginning of the script.
 
-###Making plots: 
-Below are the scripts used to generate the graphs in the paper. These scripts cannot be run from terminal as Rscript [path-to-script]. 
+##Making plots: 
+Below are the scripts used to generate the graphs in the paper. These scripts cannot be run from terminal as `Rscript [path-to-script]`.
 They should be opened in R (or R studio) to asses them. They are all comprised of multiple semgents each outputting different kind of graphs and requiring input of different data.
 
 
@@ -292,7 +318,32 @@ Required packages:
 * To plot changes in each chromatin network size as continuous line (G1_network-compile.csv)
 * To work out the network radius from a tubular model and plot the radius as point with 95CI bars or the network diameter
 
+###Useful tools:
+General Bash commands for manipulating data in batch:
 
+Use this to **MOVE** all files not tifs or dvs from directory "." to another directory:
+`find . -type f ! -name "*.tif" ! -name "*.dv" -exec mv {} ~/Documents/Microscopy/2015/2015.08/EM15-08-B/ \;`
+
+Use this to **COPY** all files in this directory and below which have “*histone mod*” and end in X or Y to somewhere else
+`find . -type f \( -name "*H3K4me3*" -and \( -name "*EAL_THR.tif" -or -name "*MCNR-mask.tif" \) \) -exec cp {} /Volumes/wolf4192/papers/chrom_marks... \;`
+
+`find . -type f \( -name "*EAL_THR.tif" -or -name "*_THR_mask.tif" \) -exec cp {} /Volumes/wolf4192/data/OLDSYS \;`
+`find . -type f -name "*MCNR-mask.tif" -name "*SIR_EAL_THR.tif" -exec cp {} ~/data/ \;`
+
+finds all files that finish with centroids.csv and are also empty and removes them:
+`find . -size 0b -a -type f -name "*centroids.csv" -exec rm -f {} \;`
+
+counts the number of files of a particular type
+`find results/ -type f -name *d2b* | wc -l`
+
+>**Troubleshooting:**
+Make works with the use of `.dirstamp` files to alert it to the change in input data. This is done on purpose. As if the input data is updated then the result data is no longer relevant to the new dataset so the analysis is redone making all new files from the point of change and downstream files that depend on this.
+For a change in a script this will be all the files depending on (and including) the output of the scripts. For a change in the input data this will be ALL files.
+If the user called all `make` commands they thought necessary and then removed the data from the `/data` directory to then realise they wanted to add another `make` command they can put the relevant data back in the `/data` directory.
+However, this new data will have a date later than the `.dirstamp` of the `/results` directory. Despite the fact that the data is the same, Make believes it is updated and will try to re-run the whole analysis.
+In such scenario, to avoid this, find all `.dirstamp` files in the `/results` directory and all directories below and delete them:
+`find results/ -type f -name ".dirstamp*" -exec rm {} +`
+This will allow Makefile to match the results to the data by the filename only and update a new `.dirstamp` so all the analysis does not need to be repeated.
 
 
 

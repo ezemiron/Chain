@@ -106,6 +106,59 @@
     &gt; library('bioimagetools')
     Bioimagetools 1.1.3
 </code></pre>
+  <blockquote>
+   <p>
+    <strong>
+     Troubleshooting:
+    </strong>
+    <br/>
+    If R complains when installing bioimagetools it may lack system-wide libraries. These would have to be installed from terminal, probably with admin rights. eg:
+    <br/>
+    libssl-dev:
+    <code>
+     sudo apt-get install libssl-dev
+    </code>
+    <br/>
+    libcurl4:
+    <code>
+     sudo apt-get install libcurl4
+    </code>
+    <br/>
+    libcurl4-openssl-dev:
+    <code>
+     sudo apt-get install libcurl4-openssl-dev
+    </code>
+    <br/>
+    libtiff5-dev:
+    <code>
+     sudo apt-get install libtiff5-dev
+    </code>
+    <br/>
+    EBImage:
+    <br/>
+    <code>
+     if (!requireNamespace("BiocManager", quietly = TRUE))
+    </code>
+    <br/>
+    <code>
+     install.packages("BiocManager")
+    </code>
+    <br/>
+    <code>
+     BiocManager::install("EBImage", version = "3.8")
+    </code>
+    <br/>
+    Or for older versions:
+    <br/>
+    <code>
+     source("https://bioconductor.org/biocLite.R")
+    </code>
+    <br/>
+    <code>
+     biocLite("EBImage")
+    </code>
+   </p>
+  </blockquote>
   <h4 id="octave-at-least-octave-403">
    Octave: at least Octave 4.0.3
   </h4>
@@ -136,6 +189,12 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
    To guide bioformats to the location of the bioformats_package.jar located on the machine.
    <br/>
    If you are doing this on your own machine the PATH you write inside the javaclasspath file will change.
+  </p>
+  <p>
+   see:
+   <a href="https://docs.openmicroscopy.org/bio-formats/5.8.1/users/octave/index.html">
+    https://docs.openmicroscopy.org/bio-formats/5.8.1/users/octave/index.html
+   </a>
   </p>
   <h4 id="graphicsmagick-1323">
    GraphicsMagick-1.3.23
@@ -721,6 +780,65 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
     *_rd2b.csv
    </code>
   </p>
+  <blockquote>
+   <p>
+    <strong>
+     Troubleshooting:
+    </strong>
+    <br/>
+    The Make workflow will work automatically until this point.
+    <br/>
+    That is to say that typing
+    <code>
+     make d2b
+    </code>
+    will result in all files being made which are required to make the d2b files. This includes masks, SEGs, boundaries etcs.
+    <br/>
+    The next two scripts (d2bfit and d2bnorm) are also managed by the Make system. However typing
+    <code>
+     make d2bfit
+    </code>
+    or
+    <code>
+     make d2bnorm
+    </code>
+    without having all files required will result in an error saying that there is no recipe to make the required output files of these scripts.
+    <br/>
+    This is related to the dual outputs of the
+    <code>
+     d2b
+    </code>
+    script which are the dual inputs of
+    <code>
+     d2bfit
+    </code>
+    command.
+    <br/>
+    Thus if the output of
+    <code>
+     d2bfit
+    </code>
+    or
+    <code>
+     d2bnorm
+    </code>
+    are required, it is adviced to do this in two steps.
+    <br/>
+    1.
+    <code>
+     make d2b
+    </code>
+    <br/>
+    2.
+    <code>
+     make d2bfit
+    </code>
+    or
+    <code>
+     make d2bnorm
+    </code>
+   </p>
+  </blockquote>
   <h4 id="distance-fit-to-model">
    Distance fit to model
   </h4>
@@ -742,7 +860,7 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
     script:
    </strong>
    <code>
-    nucleus_mask.m
+    d2bfit.R
    </code>
    <br/>
    To use a least squares regression to fit a
@@ -783,7 +901,7 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
     script:
    </strong>
    <code>
-    nucleus_mask.m
+    d2bnorm.R
    </code>
    <br/>
    To make normalised distances
@@ -847,8 +965,8 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
    </em>
    n.
   </p>
-  <h2 id="final-data-management">
-   Final data management
+  <h2 id="final-data-management-and-aggregation">
+   Final data management and aggregation
   </h2>
   <p>
    After processing with Cha
@@ -1023,11 +1141,15 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
   <p>
    For changes in cell type and condition each script needs to be manually adjusted by changing those variables at the beginning of the script.
   </p>
-  <h3 id="making-plots">
+  <h2 id="making-plots">
    Making plots:
-  </h3>
+  </h2>
   <p>
-   Below are the scripts used to generate the graphs in the paper. These scripts cannot be run from terminal as Rscript [path-to-script].
+   Below are the scripts used to generate the graphs in the paper. These scripts cannot be run from terminal as
+   <code>
+    Rscript [path-to-script]
+   </code>
+   .
    <br/>
    They should be opened in R (or R studio) to asses them. They are all comprised of multiple semgents each outputting different kind of graphs and requiring input of different data.
   </p>
@@ -1143,6 +1265,124 @@ $ octave --eval 'pkg install bioformats-octave-5.9.2.tar.gz'
     To work out the network radius from a tubular model and plot the radius as point with 95CI bars or the network diameter
    </li>
   </ul>
+  <h3 id="useful-tools">
+   Useful tools:
+  </h3>
+  <p>
+   General Bash commands for manipulating data in batch:
+  </p>
+  <p>
+   Use this to
+   <strong>
+    MOVE
+   </strong>
+   all files not tifs or dvs from directory “.” to another directory:
+   <br/>
+   <code>
+    find . -type f ! -name "*.tif" ! -name "*.dv" -exec mv {} ~/Documents/Microscopy/2015/2015.08/EM15-08-B/ \;
+   </code>
+  </p>
+  <p>
+   Use this to
+   <strong>
+    COPY
+   </strong>
+   all files in this directory and below which have “
+   <em>
+    histone mod
+   </em>
+   ” and end in X or Y to somewhere else
+   <br/>
+   <code>
+    find . -type f \( -name "*H3K4me3*" -and \( -name "*EAL_THR.tif" -or -name "*MCNR-mask.tif" \) \) -exec cp {} /Volumes/wolf4192/papers/chrom_marks... \;
+   </code>
+  </p>
+  <p>
+   <code>
+    find . -type f \( -name "*EAL_THR.tif" -or -name "*_THR_mask.tif" \) -exec cp {} /Volumes/wolf4192/data/OLDSYS \;
+   </code>
+   <br/>
+   <code>
+    find . -type f -name "*MCNR-mask.tif" -name "*SIR_EAL_THR.tif" -exec cp {} ~/data/ \;
+   </code>
+  </p>
+  <p>
+   finds all files that finish with centroids.csv and are also empty and removes them:
+   <br/>
+   <code>
+    find . -size 0b -a -type f -name "*centroids.csv" -exec rm -f {} \;
+   </code>
+  </p>
+  <p>
+   counts the number of files of a particular type
+   <br/>
+   <code>
+    find results/ -type f -name *d2b* | wc -l
+   </code>
+  </p>
+  <blockquote>
+   <p>
+    <strong>
+     Troubleshooting:
+    </strong>
+    <br/>
+    Make works with the use of
+    <code>
+     .dirstamp
+    </code>
+    files to alert it to the change in input data. This is done on purpose. As if the input data is updated then the result data is no longer relevant to the new dataset so the analysis is redone making all new files from the point of change and downstream files that depend on this.
+    <br/>
+    For a change in a script this will be all the files depending on (and including) the output of the scripts. For a change in the input data this will be ALL files.
+    <br/>
+    If the user called all
+    <code>
+     make
+    </code>
+    commands they thought necessary and then removed the data from the
+    <code>
+     /data
+    </code>
+    directory to then realise they wanted to add another
+    <code>
+     make
+    </code>
+    command they can put the relevant data back in the
+    <code>
+     /data
+    </code>
+    directory.
+    <br/>
+    However, this new data will have a date later than the
+    <code>
+     .dirstamp
+    </code>
+    of the
+    <code>
+     /results
+    </code>
+    directory. Despite the fact that the data is the same, Make believes it is updated and will try to re-run the whole analysis.
+    <br/>
+    In such scenario, to avoid this, find all
+    <code>
+     .dirstamp
+    </code>
+    files in the
+    <code>
+     /results
+    </code>
+    directory and all directories below and delete them:
+    <br/>
+    <code>
+     find results/ -type f -name ".dirstamp*" -exec rm {} +
+    </code>
+    <br/>
+    This will allow Makefile to match the results to the data by the filename only and update a new
+    <code>
+     .dirstamp
+    </code>
+    so all the analysis does not need to be repeated.
+   </p>
+  </blockquote>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js">
   </script>
   <script>
