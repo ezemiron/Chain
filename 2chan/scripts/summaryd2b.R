@@ -22,7 +22,7 @@ dirchosen  <- readline(prompt = "This script should be run from the results dire
 dirchosen <- getwd()
 
 celltype = "C127"
-condition = "Trip"
+condition = "ABcomps"
 topPATH = paste(celltype, condition, sep = "/")
 
 dir_names <- list.dirs(topPATH, recursive = TRUE)
@@ -55,7 +55,7 @@ for (dir_name in dir_names){
     
 ###########################
 #for normalised d2b only:
-    filesandpaths  <- grep("*d2bnorm.csv",allfilesandpaths, value = TRUE)
+    filesandpaths  <- grep("*d2bnormB.csv",allfilesandpaths, value = TRUE)
     if (length(filesandpaths) > 0){
 
     for (fileandpath in filesandpaths){
@@ -93,14 +93,14 @@ for (dir_name in dir_names){
 #p<-ggplot(data=data, aes(x=interval, y=OR, colour=Drug)) + geom_point() + geom_line()
 #p<-p+geom_ribbon(aes(ymin=data$lower, ymax=data$upper), linetype=2, alpha=0.1)
 
-    savename  <- paste0(var_name,"_d2bnorm-summary.csv")
+    savename  <- paste0(var_name,"_d2bnormB-summary.csv")
     write.csv(df,savename);
     }
 
 ###########################
 #for absolute marker and random d2b only:
 
-filesandpaths2  <- grep("*d2bfit.csv",allfilesandpaths, value = TRUE)
+filesandpaths2  <- grep("*d2bfitB.csv",allfilesandpaths, value = TRUE)
     if (length(filesandpaths2) > 0){
     numcells <- 0
 
@@ -132,9 +132,9 @@ filesandpaths2  <- grep("*d2bfit.csv",allfilesandpaths, value = TRUE)
     Rabsdf <- cbind(Randommu,Randomsigma,numcells)
     rownames(Rabsdf) <- var_name
     
-    savename2  <- paste0(var_name,"_abs-md2b_summary.csv")
+    savename2  <- paste0(var_name,"_abs-md2bB_summary.csv")
     write.csv(Mabsdf,savename2);
-    savename3  <- paste0(var_name,"_abs-rd2b_summary.csv")
+    savename3  <- paste0(var_name,"_abs-rd2bB_summary.csv")
     write.csv(Rabsdf,savename3);
     }
 
@@ -143,7 +143,7 @@ filesandpaths2  <- grep("*d2bfit.csv",allfilesandpaths, value = TRUE)
 ###########################
 #for POSITVE fitted random d2b only, metric for chromatin network width:
 
-    filesandpaths  <- grep("*d2bnorm.csv",allfilesandpaths, value = TRUE)
+    filesandpaths  <- grep("*d2bnormB.csv",allfilesandpaths, value = TRUE)
     if (length(filesandpaths) > 0){
 
     for (fileandpath in filesandpaths){
@@ -181,7 +181,7 @@ filesandpaths2  <- grep("*d2bfit.csv",allfilesandpaths, value = TRUE)
 #p<-ggplot(data=data, aes(x=interval, y=OR, colour=Drug)) + geom_point() + geom_line()
 #p<-p+geom_ribbon(aes(ymin=data$lower, ymax=data$upper), linetype=2, alpha=0.1)
 
-    savename  <- paste0(var_name,"_network-summary.csv")
+    savename  <- paste0(var_name,"_networkB-summary.csv")
     write.csv(df4,savename);
     }
 

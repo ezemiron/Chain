@@ -63,7 +63,7 @@ for (topdir_name in topdir_names){
     allfilesandpaths <- list.files(pattern= var_name, full.names=TRUE);
 
     if (length(allfilesandpaths) > 0){
-      d2bFsum  <- grep("*abs-md2b_summary.csv",allfilesandpaths, value = TRUE)
+      d2bFsum  <- grep("*abs-md2bB_summary.csv",allfilesandpaths, value = TRUE)
 
       if (length(d2bFsum) > 0){
 
@@ -93,7 +93,7 @@ dfA1 <- cbind(condition, dfA1)
 
 
 setwd(dirchosen2)
-savename  <- paste0(con_name,"_md2b-compile.csv")
+savename  <- paste0(con_name,"_md2bB-compile.csv")
 write.csv(dfA1,savename);
 
 
@@ -116,7 +116,7 @@ setwd(dirchosen)
     allfilesandpaths <- list.files(pattern= var_name, full.names=TRUE);
 
     if (length(allfilesandpaths) > 0){
-      d2bFsum  <- grep("*d2bnorm-summary.csv",allfilesandpaths, value = TRUE)
+      d2bFsum  <- grep("*d2bnormB-summary.csv",allfilesandpaths, value = TRUE)
 
       if (length(d2bFsum) > 0){
 
@@ -144,7 +144,7 @@ dfA1 <- cbind(condition, dfA1)
 
 
 setwd(dirchosen2)
-savename  <- paste0(con_name,"_d2bnorm-compile.csv")
+savename  <- paste0(con_name,"_d2bnormB-compile.csv")
 write.csv(dfA1,savename);
 
 
@@ -167,7 +167,7 @@ setwd(dirchosen)
     allfilesandpaths <- list.files(pattern= var_name, full.names=TRUE);
 
     if (length(allfilesandpaths) > 0){
-      d2bFsum  <- grep("*_network-summary.csv",allfilesandpaths, value = TRUE)
+      d2bFsum  <- grep("*_networkB-summary.csv",allfilesandpaths, value = TRUE)
 
       if (length(d2bFsum) > 0){
 
@@ -195,7 +195,7 @@ dfA1 <- cbind(condition, dfA1)
 
 
 setwd(dirchosen2)
-savename  <- paste0(con_name,"_network-compile.csv")
+savename  <- paste0(con_name,"_networkB-compile.csv")
 write.csv(dfA1,savename);
 
 
