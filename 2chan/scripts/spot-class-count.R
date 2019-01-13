@@ -28,7 +28,7 @@ dirchosen <- getwd()
 #dirchosen <- "/home/eze/Documents/papers/chrom_marks/results"
 
 cell="C127"
-condition="Trip"
+condition="numtest"
 
 dir = paste0(cell,"/", condition, "/")
 dir_names <- list.dirs(dir, recursive = FALSE)
@@ -69,14 +69,34 @@ for (dir_name in dir_names){
 #    df <- transform(df, AvNorm = rowMeans(df[,-1], na.rm = TRUE))
 #    df <- transform(df, Log2AvNorm = log2(df$AvNorm))
 
+#aggregate for spot-class-count:
         savename  <- paste0(var_name,"_spot-class-count.csv")
         write.csv(df,savename);
 
+#aggregate for spot-sum-summary:
+	df3 <- data.frame(var_name, aggregate(df[,2], list(cell =df$cell), sum))
+
+#	df3 <-aggregate(df[,2], list(cell =df$cell), sum)
+	names(df3) <- c("marker","cell","spotnum")
+
+#	df3 <- data.frame(var_name, sum(df$spotnum), max(df$cell))
+#	names(df3) <- c("marker", "spotnum", "cellnum")
+
+        savename3  <- paste0(var_name,"_spot-num-summary.csv")
+        write.csv(df3,savename3);
+
+#aggregate for spot-class-summary:
         df2 <-aggregate(df[,2:3], list(class =df$class), mean)
         df2 <-transform(df2, numofcells = rep(max(df$cell),dim(df2)[1]))
       
         savename2  <- paste0(var_name,"_spot-class-summary.csv")
         write.csv(df2,savename2);
+
+
+
+
+
+
         }
     }
 }
