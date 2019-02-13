@@ -90,16 +90,19 @@ con_names <- list.dirs(celltype, recursive = FALSE,full.names=FALSE)
 #rename
         dfA <- dfA[2:nrow(dfA),]
 	names(dfA) <- c("Marker", "cell","spotnum")
+
+	dfZ <- dfA
 	
 	dfB <- data.frame(
 	aggregate(dfA$spotnum, list(Marker =dfA$Marker), sum),
 	aggregate(dfA$spotnum, list(Marker =dfA$Marker), mean),
-	aggregate(dfA$spotnum, list(Marker =dfA$Marker), sd),
-	max(dfA$cell)
+	aggregate(dfZ$spotnum, list(Marker =dfZ$Marker), sd),
+	aggregate(dfZ$cell, list(Marker =dfZ$Marker), max)
 	)
 
+
 	dfB <- cbind(con_name,dfB)
-	dfB <- dfB[,c(1:3,5,7:8)]
+	dfB <- dfB[,c(1:3,5,7,9)]
         names(dfB) <- c("condition","Marker","TSpotnum","AvSpotnum","sdSpotnum" ,"cellnum")
 
         savename  <- paste0(con_name,"_spot-num_compile.csv")
