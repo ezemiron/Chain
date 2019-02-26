@@ -62,7 +62,9 @@ clean:
 
 ## Our base images (by now they have already been reconstructed, aligned,
 ## and thresholded to 16 bit integers).
-THR_FILES := $(shell find data/ -type f -name '*_THR.tif')
+##THR_FILES := $(shell find data/ -type f -name '*_THR.tif')
+THR_FILES := $(shell find data/ -type f -name '*_THR*.tif')
+ 
 
 ## The images in this files were acquired incorrectly.  They will have
 ## chromatin staining on the first channel instead of the second.
@@ -72,6 +74,7 @@ THR_CHROMATIN_FIRST_FILES := $(shell find data/ -type f -name 'EM15-10-B*_THR.ti
 EDU_ONLY_FILES := $(shell find data/ -type f -name '*EdU*_THR.tif')
 THR_EDU_FILES := $(filter-out $(THR_CHROMATIN_FIRST_FILES), $(THR_FILES))
 THR_ONLY_FILES := $(filter-out $(EDU_ONLY_FILES), $(THR_FILES))
+
 
 ## Makefile oddities... We do this so we can use them int pattern rules
 ## because we can't escape stuff there http://stackoverflow.com/a/19324181/1609556
@@ -110,8 +113,16 @@ results/%$(UNDERSCORE)centroids.csv: results/%$(UNDERSCORE)mask.tif data/%.tif
 results/%$(UNDERSCORE)SEG.tif: results/%$(UNDERSCORE)mask.tif data/%.tif
 	$(RSCRIPT) scripts/chromseg.R 2 $^ $@
 
-results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEG.tif data/%$(UNDERSCORE)EAL$(UNDERSCORE)MCNR-mask.tif
+#results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)distn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEG.tif data/%$(UNDERSCORE)EAL$(UNDERSCORE)MCNR-mask.tif
+#	$(RSCRIPT) scripts/distribution.R $^ > $@
+
+#####
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)c2-DAPI$(UNDERSCORE)distn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)c2-DAPI$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)c2-DAPI$(UNDERSCORE)SEG.tif data/%$(UNDERSCORE)ALN$(UNDERSCORE)MCNR-mask$(UNDERSCORE)c2-DAPI.tif
 	$(RSCRIPT) scripts/distribution.R $^ > $@
+
+results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)c2-H2B$(UNDERSCORE)distn.csv: results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)c2-H2B$(UNDERSCORE)centroids.csv results/%$(UNDERSCORE)SIR$(UNDERSCORE)THR$(UNDERSCORE)ALN$(UNDERSCORE)c2-H2B$(UNDERSCORE)SEG.tif data/%$(UNDERSCORE)ALN$(UNDERSCORE)MCNR-mask$(UNDERSCORE)c2-H2B.tif
+	$(RSCRIPT) scripts/distribution.R $^ > $@
+#####
 
 results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)bound.tif: results/%$(UNDERSCORE)SIR$(UNDERSCORE)EAL$(UNDERSCORE)THR$(UNDERSCORE)SEG.tif
 	$(OCTAVE) scripts/bound.m 1 $^ $@
