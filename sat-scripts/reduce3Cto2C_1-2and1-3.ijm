@@ -1,12 +1,13 @@
 
 dir1 = getDirectory("Choose Source Directory ");
-dir2 = getDirectory("Choose Destination Directory ");
+dir2 = getDirectory("Choose Destination Directory (Different from Source directory)");
 list = getFileList(dir1);     //gets list of files in dir1
 setBatchMode(true);
 for (i=0; i<list.length; i++) {
     showProgress(i+1, list.length);
     filename = dir1 + list[i];
-    string=replace(list[i],"(.tif)",".tif"); 
+    string1=replace(list[i],"(.tif)","_c2-H2B"); 
+    string2=replace(list[i],"(.tif)","_c2-DAPI"); 
     
     
     if (endsWith(filename, ".tif")) {
@@ -25,14 +26,25 @@ for (i=0; i<list.length; i++) {
           selectWindow("C3-"+filetitle);
           titleC3=getTitle();
 
-          selectWindow("C4-"+filetitle);
-          titleC4=getTitle();
-
           run("Merge Channels...", 
-          "c1=&titleC1 c2=&titleC2 c3=&titleC4 create");
-    
-    saveAs("TIFF",dir2+string);     //saves as a new tiff in dir2
-    close();
+          "c1=&titleC1 c2=&titleC2 create keep");
+	  
+	 // savename = replace(filetitle, ".tif","_c2-H2B");
+	  saveAs("TIFF",dir2+string1);
+	 // close();
+
+	  run("Merge Channels...", 
+          "c1=&titleC1 c2=&titleC3 create keep");
+	  
+	 // savename = replace(filetitle, ".tif","_c2-H2B");
+	  saveAs("TIFF",dir2+string2);
+
+//      closes all open images
+      while (nImages>0) 
+          { 
+          selectImage(nImages); 
+          close(); 
+          }
   }
 }
 
