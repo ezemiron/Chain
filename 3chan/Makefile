@@ -79,7 +79,7 @@ HCT_ONLY_FILES := $(shell find data/ -type f -name '*G1*THR_ALN.tif')
 ##4C_EDU_ONLY := $(shell find data/ -type f -name '*4-color-EdU_*THR_ALN.tif')
 ##THR_EDU_FILES := $(filter-out $(HCT_ONLY_FILES), $(THR_CHROMATIN_FIRST_FILES), $(THR_FILES))
 ##THR_ONLY_FILES := $(filter-out $(HCT_ONLY_FILES), $(EDU_ONLY_FILES), $(THR_FILES))
-FO_ONLY_FILES := $(shell find data/ -type f -name 'FO*THR_ALN.tif')
+FO_ONLY_FILES := $(shell find data/ -type f -name '201902*THR_ALN.tif')
 
 
 ## Makefile oddities... We do this so we can use them int pattern rules
