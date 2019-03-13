@@ -70,12 +70,12 @@ THR_FILES := $(shell find data/ -type f -name '*ALN_THR.tif')
 
 ## The images in this files were acquired incorrectly.  They will have
 ## chromatin staining on the first channel instead of the second.
-THR_CHROMATIN_FIRST_FILES := $(shell find data/ -type f -name 'EM15-10-B*_THR.tif')
+#THR_CHROMATIN_FIRST_FILES := $(shell find data/ -type f -name 'EM15-10-B*_THR.tif')
 
 ##Distinguish between images of 2 or 3 (EdU) channels:
 ##EDU_ONLY_FILES := $(shell find data/ -type f -name 'PO*EdU*_THR.tif')
 #NNA_ONLY_FILES := $(shell find data/ -type f -name '*Cloud*_THR_MCF_ALN.tif')
-HCT_ONLY_FILES := $(shell find data/ -type f -name '*G1*THR_ALN.tif')
+#HCT_ONLY_FILES := $(shell find data/ -type f -name '*G1*THR_ALN.tif')
 ##4C_EDU_ONLY := $(shell find data/ -type f -name '*4-color-EdU_*THR_ALN.tif')
 ##THR_EDU_FILES := $(filter-out $(HCT_ONLY_FILES), $(THR_CHROMATIN_FIRST_FILES), $(THR_FILES))
 ##THR_ONLY_FILES := $(filter-out $(HCT_ONLY_FILES), $(EDU_ONLY_FILES), $(THR_FILES))
@@ -404,10 +404,10 @@ DIRSTAMPS := $(addsuffix /.dirstamp, $(RESULT_DIRS))
 
 ##Uncomment both of the "@mkdir..." lines below if a new directory was added to data/
 results/.dirstamp:
-#	@mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	@touch $@
 
 .SECONDEXPANSION:
 $(DIRSTAMPS): $$(dir $$(patsubst %/.dirstamp, %, $$@)).dirstamp
-#	@mkdir $(dir $@)
+	@mkdir $(dir $@)
 	@touch $@

@@ -17,7 +17,22 @@
 
 pkg load image;
 
-#loose:
+#old:
+function edu_mask_clean = get_edu_mask_old (edu)
+  se_2d = strel ("disk", 1, 0);
+  edu_mask = im2bw (imdilate (edu, se_3d), graythresh (edu(:)));
+
+  edu_mask = im2bw (edu, graythresh (edu(:)));
+  edu_mask = reshape (edu_mask, size (edu));
+  edu_mask = imclose (edu_mask, se_2d);
+  
+  edu_mask_clean = edu_mask;
+  #edu_mask_clean = bwareaopen (edu_mask, 10000, ones (3, 3));
+endfunction
+
+
+
+#normal:
 function edu_mask_clean = get_edu_mask (edu)
   se_2d = strel ("disk", 1, 0);
   se_3d = strel ("arbitrary", repmat (getnhood (se_2d), [1 1 3]));
@@ -34,9 +49,9 @@ function edu_mask_clean = get_edu_mask (edu)
 #size exclusion for large spots
   edu_mask_large = bwareaopen (edu_mask_med_large, 150, ones (3, 3));
   edu_mask_clean = minus(edu_mask_med_large,edu_mask_large);
-
-
 endfunction
+
+
 
 #loose:
 function edu_mask_clean = get_edu_mask_loose (edu)
@@ -103,7 +118,8 @@ function [rv] = main (argv)
   edu = imread (in_fpath, "Index", edu_channel:3:n_img);
 
 #choose "normal" or loose mask
-  mask = get_edu_mask (edu);
+  mask = get_edu_mask_old (edu);
+  #mask = get_edu_mask (edu);
   #mask = get_edu_mask_loose (edu);
 
   ##we are having to write this logical mask as an 8bit due to R unable to open "1bit" in subsequent steps
