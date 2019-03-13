@@ -20,15 +20,17 @@ pkg load image;
 #old:
 function edu_mask_clean = get_edu_mask_old (edu)
   se_2d = strel ("disk", 1, 0);
-  edu_mask = im2bw (imdilate (edu, se_3d), graythresh (edu(:)));
+  se_3d = strel ("arbitrary", repmat (getnhood (se_2d), [1 1 3]));
 
-  edu_mask = im2bw (edu, graythresh (edu(:)));
+  edu_mask = im2bw (imdilate (edu, se_3d), graythresh (edu(:)));
+  #edu_mask = bwfill (edu_mask, "holes", 8);
   edu_mask = reshape (edu_mask, size (edu));
   edu_mask = imclose (edu_mask, se_2d);
   
   edu_mask_clean = edu_mask;
   #edu_mask_clean = bwareaopen (edu_mask, 10000, ones (3, 3));
 endfunction
+
 
 
 
