@@ -1,7 +1,7 @@
 # Cha*i*N - Cha*i*N high-throughput analysis of the *in situ* Nucleome
 
 ## What?
-A tool to dissect the spatial distribution of the mammalian nucleome relative to chromatin from super resolution 3D structured illumination microscopy (3D SIM) data. This tool was developed as part of my doctoral thesis and was used in a related publication.
+A tool to dissect the spatial distribution of the mammalian nucleome relative to chromatin from super resolution 3D structured illumination microscopy (3D SIM) data. This tool was developed as part of my doctoral thesis and was used in a related publication: https://www.biorxiv.org/content/10.1101/566638v3
 
 ## Where?
 The original versions of Cha*i*N are currently in the Oxford biochemistry Micron servers under `wolf4192/Chain/`
