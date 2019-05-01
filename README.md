@@ -1,4 +1,4 @@
-# Cha*i*N - Cha*i*N analysis of the *in situ* Nucleome
+# Cha*i*N - Cha*i*N high-throughput analysis of the *in situ* Nucleome
 
 ## What?
 A tool to dissect the spatial distribution of the mammalian nucleome relative to chromatin from super resolution 3D structured illumination microscopy (3D SIM) data. This tool was developed as part of my doctoral thesis and was used in a related publication.
