@@ -78,7 +78,7 @@ function [rv] = main (argv)
   mask_fpath = argv{5};
   d2bmarker_fpath = argv{6};
   d2brandom_fpath = argv{7};
-  vox = [41,41,125];
+  vox = [20,20,20];
 
 #read:
 

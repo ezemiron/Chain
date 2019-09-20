@@ -47,7 +47,7 @@ main <-function (argv)
     csv1 <- read.csv(centroids.fpath, header=TRUE);
     MCNRlogic = (1==MCNRmask)
     
-    vox  <- c(41, 41, 125)
+    vox  <- c(20, 20, 20)
     x.microns <- (dim(MCNRmask)[2]*vox[2])/1000
     y.microns <- (dim(MCNRmask)[1]*vox[1])/1000
     z.microns <- (dim(MCNRmask)[3]*vox[3])/1000

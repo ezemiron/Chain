@@ -85,9 +85,9 @@ function [rv] = main (argv)
   centroids = get_centroids (foci, dapi_mask);
 #  voxel_sizes = get_pixel_sizes (img_fpath);
   voxel_sizes = [
-   41
-   41
-   125
+   20
+   20
+   20
   ]';
 
   centroids(:,3) = []; # Remove coordinates from singleton dimension 3
